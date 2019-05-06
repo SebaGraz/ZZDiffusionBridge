@@ -42,11 +42,11 @@ function runall(SHORT = false)
     α = 0.7
     σ = 1.0
     L = 7
-    T = 50.0
-    clock = 2000.0
+    T = 100.0
+    clock = 5000.0
     u = -π
-    v = π
-    N = 3
+    v = 3π
+    N = 1
     @time x = fullzz(L, α, σ, u, v, T, clock, N)
     if SHORT
         return x
@@ -64,4 +64,4 @@ end
 x = runall(false)
 #png("plot3")
 #vline!(25)
-error("STOP HERE")
+#error("STOP HERE")

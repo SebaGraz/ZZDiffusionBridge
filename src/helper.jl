@@ -40,10 +40,11 @@ end
 function λratio(k::GFSbase, ξ, θ, τ, α, σ, u, v, N) #sta attento a non mpdificare il vettore
     ϵ = 0
     t = MCintegration(k, N)
+    w = 1/N
     for i in 1:N
         cc = c(k, ξ, t[i], u, v)
         ϕ = Λ(t[i], k.i ,k.j, k.T)
-        ϵ += 0.2*ϕ*(α/σ*sin(2.0*(cc + ξ[k.n]*ϕ )) - sin(cc + ξ[k.n]*ϕ ))
+        ϵ += w*ϕ*(α/σ*sin(2.0*(cc + ξ[k.n]*ϕ )) - sin(cc + ξ[k.n]*ϕ ))
     end
     return max(0, θ[k.n]*(0.5*k.range*α/σ*ϵ + ξ[k.n]))/((α/σ + 1)*0.5*k.δ*α*abs(θ[k.n]) + abs(ξ[k.n]*θ[k.n]))
 end
