@@ -62,6 +62,6 @@ end
 
 
 x = runall(false)
-#png("plot3")
+png("./output/plot2")
 #vline!(25)
 #error("STOP HERE")
