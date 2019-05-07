@@ -48,13 +48,13 @@ p = plot()
 dt = 0.001
 t = 0:dt:10
 d = length(t)
-b = 10
-σ = 0.1
+b = 1.0
+σ = 1.0
 for j in 1:1
     N = randn(d-1)
     global x = zeros(d)
     for i = 1:d-1
-        x[i+1] = x[i] + (-b*x[i])*dt  + σ*sqrt(dt)*N[i]
+        x[i+1] = x[i] + b*(sin(x[i]))*dt  + σ*sqrt(dt)*N[i]
     end
     plot!(p, t, x, color= RGB(j/10, 0.5, 1-j/10), linewidth=0.3, alpha = 1.0)
 end
