@@ -43,7 +43,7 @@ function runall(SHORT = false)
     σ = 1.0
     L = 7
     T = 100.0
-    clock = 5000.0
+    clock = 100.0
     u = -π
     v = 3π
     N = 1
@@ -62,6 +62,5 @@ end
 
 
 x = runall(false)
-png("./output/plot2")
 #vline!(25)
 #error("STOP HERE")
