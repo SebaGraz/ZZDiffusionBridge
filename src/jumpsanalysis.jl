@@ -14,17 +14,15 @@ function fullzz(L, α, σ, u, v, T, clock , N=1)
     k = [GFSbase(i, L, T) for i in 1:d] #inizialize basis
     ξ = zeros(d)
     θ = fill(1, d)
-    Ξ = Skeleton[]
     τ = zeros(d)
     jumps = zeros(d)
     while t < clock
         τ0, i0 = findmin(τ)
-        jumps[i0] += 1
         ξ = ξ + θ*τ0
         t = t + τ0
         if λratio(k[i0], ξ, θ, τ0, α, σ, u, v, N) > rand()
-            push!(Ξ, Skeleton(t,ξ))
             θ[i0] = -θ[i0]
+            jumps[i0] += 1
         end
         τ[i0] = TimeAbs(k[i0], ξ[i0], θ[i0], α, σ, rand())
         for j in 1: i0 - 1          #can be improved without if statement
@@ -46,7 +44,7 @@ function fullzz(L, α, σ, u, v, T, clock , N=1)
 end
 
 function runalljumps()
-    α = 0.0
+    α = 0.7
     σ = 1.0
     L = 7
     T = 100.0
@@ -81,8 +79,9 @@ end
 
 
 x = runalljumps()
-jum = jumps(x)
 scatter(x)
-png("./output/jumpsXcoordinate0.0e1.0")
+jum = jumps(x)
+scatter(jum)
+png("./output/jumpsXlevels0.7e1.0.png")
 
 2^(7+1)
