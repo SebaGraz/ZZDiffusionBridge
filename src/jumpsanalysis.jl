@@ -46,7 +46,7 @@ end
 function runalljumps()
     α = 0.7
     σ = 1.0
-    L = 7
+    L = 5
     T = 100.0
     clock = 2000.0
     u = -π
