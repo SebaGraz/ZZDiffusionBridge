@@ -1,7 +1,3 @@
-
-
-
-
 # dependence structure for each stochastic differential equation
 dependence_strucute(::LogGrowthSDE) = PartialIndependence()
 dependence_strucute(::SinSDE) = FullIndependence()
