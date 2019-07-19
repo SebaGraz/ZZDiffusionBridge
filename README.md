@@ -13,6 +13,8 @@ It takes a diffusion Model with its parameters, its initial and final point
 
 ## Examples
 
+for derivation of the set poisson rates see link to docs
+
 ## Developing the ZigZag for a new SDE
 it requires the creation of 2 functions and 2 flags
 
