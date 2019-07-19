@@ -1,66 +1,51 @@
-include("faber.jl")
-include("structures.jl")
-include("helper.jl")
-include("plotting.jl")
-using StatsBase
 
-function fullzz(L, α, σ, u, v, T, clock , N=1)
-    d =  2^(L+1) - 1 ; t = 0.0 ;
-    k = [GFSbase(i, L, T) for i in 1:d] #inizialize basis
-    ξ = zeros(d)
-    θ = fill(1, d)
-    Ξ = Skeleton[]
-    τ = zeros(d)
-    while t < clock
-        τ0, i0 = findmin(τ)
-        ξ = ξ + θ*τ0
-        t = t + τ0
-        if λratio(k[i0], ξ, θ, τ0, α, σ, u, v, N) > rand()
-            push!(Ξ, Skeleton(t,ξ))
-            θ[i0] = -θ[i0]
-        end
-        τ[i0] = TimeAbs(k[i0], ξ[i0], θ[i0], α, σ, rand())
-        for j in 1: i0 - 1          #can be improved without if statement
-            if j in k[i0].nhb
-                τ[j] = TimeAbs(k[j], ξ[j], θ[j], α, σ, rand())
-            else
-                τ[j] = τ[j] - τ0
-            end
-        end
-        for j in i0 + 1:d           #can be improved without if statement
-            if j in k[i0].nhb
-                τ[j] = TimeAbs(k[j], ξ[j], θ[j], α, σ, rand())
-            else
-                τ[j] = τ[j] - τ0
-            end
-        end
-    end
-    return(Ξ)
-end
 
-function runall(SHORT = false)
-    α = 0.7
-    σ = 1.0
+
+
+# dependence structure for each stochastic differential equation
+dependence_strucute(::LogGrowthSDE) = PartialIndependence()
+dependence_strucute(::SinSDE) = FullIndependence()
+dependence_strucute(::OUSDE) = PartialIndependence()
+
+
+# sampling scheme for each stochastic differential equation
+sampling_scheme(::LogGrowthSDE) = SubSampling()
+sampling_scheme(::SinSDE) = SubSampling()
+sampling_scheme(::OUSDE) = Regular()
+
+
+function runall(sin = true)
+    T = 200.0
+    clock = 200.0
     L = 7
-    T = 100.0
-    clock = 100.0
-    u = -π
-    v = 3π
-    N = 1
-    @time x = fullzz(L, α, σ, u, v, T, clock, N)
-    if SHORT
-        return x
+    if sin == true
+        α = 0.7 #sin
+        u = - 3π
+        v = + 3π
+        X = SinSDE(α)
+    else
+        K = 2000
+        r = 0.1
+        β = 0.1
+        u = -log(50)/β     # end points in the lamperti transform
+        v= -log(1000)/β
+        X = LogGrowthSDE(r, K, β)   #end points in the lamperti tranform
     end
-    burning = 10    #burning
-    f = clock - 1.0; n = 60
+    XX = zigzagsampler(X::AbstractModel, T, L, u, v, clock)
+    burning = 10.0    #burning
+    f = clock - 1.0; n = 30
     db = (f-burning)/n
     b =  burning:db:f
-    plotmixing(x, b, T, L, u, v)
-    return x
+    if sin == true
+        p = plotmixing(XX, b, T, L, u, v)
+        hline!(p, [n*π for n in -5:2:5])
+    else
+        p = plotmixing(XX, b, T, L, u, v, x -> exp(- x*β))
+        hline!(p, [K])
+    end
+    display(p)
+    return XX
 end
 
-
-
 x = runall(false)
-#vline!(25)
-#error("STOP HERE")
+error("STOP HERE")

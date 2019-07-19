@@ -1,67 +1,42 @@
 using Plots
 
-function level(i)
-    j = 0
-    while (i != 0)
-        i = i >> 1
-        j = j + 1
-    end
-    return j-1
-end
 
 function interpolate(x1, y1, x2, y2, x)
     return ( y1 .+ (y2 .- y1)/(x2 .- x1).*(x .- x1))
 end
 
-function FindCoordinates(Ξ::Array{Skeleton,1}, t::Float64)
+
+function FindCoordinates(Ξ::Array{Skeleton,1}, t)
     tt = [Ξ[i].t for i in 1:length(Ξ)]
     i = searchsortedfirst(tt, t)
     #i = findfirst(x -> x>t ,tt)
-    return(Skeleton(t, interpolate(Ξ[i-1].t, Ξ[i-1].ξ, Ξ[i].t, Ξ[i].ξ, t)))
-end
-
-#Plot Skeleton and choose the dimension
-function Plots.plot(Ξ::Array{Skeleton,1},dims::Vector)
-    x = [Ξ[i].ξ[dims[1]] for i in 1 : length(Ξ)]
-    y = [Ξ[i].ξ[dims[2]] for i in 1 : length(Ξ)]
-    plot(x,y)
-end
-
-#### Plots
-function cies(t, ξ, L, T, u, v)
-    x = 0.0
-    i = 1
-    for l in 0:L
-        for k in 0:2^(l)-1
-            x += ξ[i]*Λ(t, l, k, T)        #### Can be much more efficient, sum of function having support on t
-            i += 1
-        end
-    end
-    x + Λ1(t, T)*u + Λ2(t, T)*v
+    return(Skeleton(interpolate(Ξ[i-1].t, Ξ[i-1].ξ, Ξ[i].t, Ξ[i].ξ, t), t))
 end
 
 
-function plotmixing(y::Array{Skeleton,1}, b, T, L, u, v)
-    p = plot()
-    dt = range(0.0, stop=T, length=2^(L+1))
+
+#x1 = Skeleton(ones(2<<1- 1), 0.0)
+#x2 = Skeleton(fill(0, 2<<1 - 1), 1.0)
+#FindCoordinates([x1,x2], 0.5).ξ
+
+function plotmixing(y::Array{Skeleton,1}, b, T::Float64, L::Int64, u::Float64, v::Float64, trasform = x -> x)
+    p = plot(leg = false)
+    dt = range(0.0, stop=T, length=2<<(L) + 1)
     for i in b
-        dx = [cies(ti, FindCoordinates(y, i).ξ, L, T, u, v) for ti in dt]
-        plot!(p, dt, dx,  color= RGB(i/b[end], 0.4, 1-i/b[end]), linewidth=0.3, alpha = 0.4)
+        dx = fs_expansion(FindCoordinates(y, i).ξ, u, v, L, T)
+        plot!(p, dt, trasform.(dx),  color= RGB(i/b[end], 0.4, 1-i/b[end]), linewidth=0.3, alpha = 0.4)
     end
-    plot!(p, leg=false)
-    hline!(p, [n*π for n in -5:2:5])
-    display(p)
+    return p
 end
 
 
-function makegif(y::Array{Skeleton,1}, b, T, L, u, v)
-    dt = range(0.0, stop=T, length=2^(L+1))
-    k = 1
-    for i in b
-        dx = [cies(ti, FindCoordinates(y, i).ξ, L, T, u, v) for ti in dt]
-        plot(dt, dx, linewidth=0.4, alpha = 0.6, leg = false)
-        hline!([n*π for n in -5:2:5])
-        savefig("images/$k")
-        k += 1
-    end
-end
+#function plottransform(y::Array{Skeleton,1}, b, T, L, u, v, β)
+#    u = -log(u)/β ; v= -log(v)/β
+#    p = plot()
+#    dt = range(0.0, stop=T, length=2^(L+1))
+#        dx = [(exp(-(cies(ti, FindCoordinates(y, i).ξ, L, T, u, v))*β)) for ti in dt]
+#        plot!(p, dt, dx,  color= RGB(i/b[end], 0.4, 1-i/b[end]), linewidth=0.3, alpha = 0.4)
+#    end
+#    plot!(p, leg=false)
+#    display(p)
+#end
