@@ -18,7 +18,7 @@ Three main types are defined ([here](src/types.jl)):
 3. the abstract type `SamplingScheme` inheriting the type of sampling scheme (`::Regular` and `::PartialIndependence` ) acting as a flag
 4. the type `System`, container of all the attributes necessary for the sampler
 
-see the issue [#11](issues/../../11) for changing system. It contains stuff that may be not used for certain models (ionefficient). Maybe this should be a tuple or we should move all the arguments which are model spcific as attributes of `::Model:<AbstractModel`.
+see the issue [#11](/../../issues/11) for changing system. It contains stuff that may be not used for certain models (ionefficient). Maybe this should be a tuple or we should move all the arguments which are model spcific as attributes of `::Model:<AbstractModel`.
 
 ## Examples
 We have three examples right now. They are [here](/src/examples) and implement the ZigZag sampler for three different sdes.
