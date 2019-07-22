@@ -14,7 +14,7 @@ It takes a diffusion Model with its parameters, its initial and final points `u,
 ### Structures
 Three main types are defined ([here](src/types.jl)): 
 1. the asbtarct type `::AbstractModel`, inheriting a specific diffusion model
-2. the abstract type `::AbstractDependenceStructure` inheriting the type of dependences (for our application we have now two subtypes `::FullIndependence` and `::PartialIndependence`) acting a a flag
+2. the abstract type `::AbstractDependenceStructure` inheriting the type of dependences (for our application we have now two subtypes `::FullIndependence` and `::PartialIndependence`) acting as a flag
 3. the abstract type `SamplingScheme` inheriting the type of sampling scheme (`::Regular` and `::PartialIndependence` ) acting as a flag
 4. the type `System`, container of all the attributes necessary for the sampler
 see the issue [#11](issues/11) for changing system. It contains stuff that may be not used for certain models (ionefficient). Maybe this should be a tuple or we should move all the arguments which are model spcific as attributes of `::Model:<AbstractModel`.
