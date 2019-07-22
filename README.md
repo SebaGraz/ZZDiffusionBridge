@@ -1,5 +1,5 @@
 # ZZDiffusionBridge
-ZigZag sampler is used to explore the conditional measure of a diffusion process. This measure lays an high dimensional space (infinite dimensional) and could differ significantly from the Gaussian measure (which in our case is the reference measure). The repo is currently under developmemt. To see and edit the notes see https://www.overleaf.com/2848134699gmmwzrpsyvsx .
+ZigZag sampler is used to explore the conditional measure of a diffusion process. This measure lays in a high dimensional space (infinite dimensional) and could differ significantly from the Gaussian measure (which in our case is the reference measure). The repo is currently under developmemt. To see and edit the notes see https://www.overleaf.com/2848134699gmmwzrpsyvsx .
 
 
 ## Overview
