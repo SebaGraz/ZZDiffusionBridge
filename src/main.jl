@@ -1,13 +1,5 @@
-# dependence structure for each stochastic differential equation
-dependence_strucute(::LogGrowthSDE) = PartialIndependence()
-dependence_strucute(::SinSDE) = FullIndependence()
-dependence_strucute(::OUSDE) = PartialIndependence()
 
 
-# sampling scheme for each stochastic differential equation
-sampling_scheme(::LogGrowthSDE) = SubSampling()
-sampling_scheme(::SinSDE) = SubSampling()
-sampling_scheme(::OUSDE) = Regular()
 
 
 function runall(sin = true)
@@ -27,7 +19,7 @@ function runall(sin = true)
         v= -log(1000)/β
         X = LogGrowthSDE(r, K, β)   #end points in the lamperti tranform
     end
-    XX = zigzagsampler(X::AbstractModel, T, L, u, v, clock)
+    XX = zigzagsampler(X, T, L, u, v, clock)
     burning = 10.0    #burning
     f = clock - 1.0; n = 30
     db = (f-burning)/n
