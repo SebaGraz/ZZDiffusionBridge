@@ -19,7 +19,8 @@ Three new types are defined ([here](src/types.jl)):
 see the issue [#11](issues/11) for changing system. It contains stuff that may be not used for certain models. Maybe tuple is better or initializing the attributes specific for a model with the parameters.
 
 ## Examples
-We have three examples right now. They are contained in the [here](/src/example) and implement the ZigZag sampler for three different sde.
+We have three examples right now. They are contained in the [here](/src/examples) and implement the ZigZag sampler for three different sde.
+
 ## Developing the ZigZag for a new SDE
 If you want to develop your own sde, you need to:
 1. define your  `::ModelName:<AbstractModel` containing the parameters
@@ -28,5 +29,8 @@ If you want to develop your own sde, you need to:
 
 dependence_strucute(::ModelName) = FullIndependence()
 sampling_scheme(::ModelName) = SubSampling()
+## Faber-Schauder functions
+the file [faber.jl](src/faber.jl) and (fs_expansion.jl) contains all the functions necessary to work with the Faber Schauder functions and change of basis to finite element basis. 
+
 ## Tuning the velocities
 TODO
