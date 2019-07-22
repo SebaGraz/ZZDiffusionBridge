@@ -1,5 +1,5 @@
 # ZZDiffusionBridge
-ZigZag sampler used to explore the conditional space of a diffusion process. Currently under developmemt. To see and edit the notes see https://www.overleaf.com/2848134699gmmwzrpsyvsx .
+ZigZag sampler is used to explore the conditional measure of a diffusion process. This measure lays an high dimensional space (infinite dimensional) and could differ significantly from the Gaussian measure (which in our case is the reference measure). The repo is currently under developmemt. To see and edit the notes see https://www.overleaf.com/2848134699gmmwzrpsyvsx .
 
 
 ## Overview
@@ -12,15 +12,15 @@ zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock
 It takes a diffusion Model with its parameters, its initial and final points `u,v`, the truncation level of the infinite summation `L`, the final time of the ZigZag sampler `clock` and as optional input, the velocity vector for each coordinate. The function returns the skeleton of the ZigZag process with the real event times. This is given in the form of `Array{Skeleton, 1}`. 
 
 ### Structures
-Three new types are defined ([here](src/types.jl)): 
-1. the asbtarct type `::AbstractModel`, inheriting a specifi diffusion model
-2. the abstract type `::AbstractDependenceStructure` inheriting the type of dependences (for our application we have now two subtypes `::FullIndependence` and `::PartialIndependence` acting as flags)
-3. the abstract type `SamplingScheme` inheriting the type of sampling scheme (`::Regular` and `::PartialIndependence` acting as flags)
-4. the type `System`, container of all the attributes necessary for the sampler.
-see the issue [#11](issues/11) for changing system. It contains stuff that may be not used for certain models. Maybe tuple is better or initializing the attributes specific for a model with the parameters.
+Three main types are defined ([here](src/types.jl)): 
+1. the asbtarct type `::AbstractModel`, inheriting a specific diffusion model
+2. the abstract type `::AbstractDependenceStructure` inheriting the type of dependences (for our application we have now two subtypes `::FullIndependence` and `::PartialIndependence`) acting a a flag
+3. the abstract type `SamplingScheme` inheriting the type of sampling scheme (`::Regular` and `::PartialIndependence` ) acting as a flag
+4. the type `System`, container of all the attributes necessary for the sampler
+see the issue [#11](issues/11) for changing system. It contains stuff that may be not used for certain models (ionefficient). Maybe this should be a tuple or we should move all the arguments which are model spcific as attributes of `::Model:<AbstractModel`.
 
 ## Examples
-We have three examples right now. They are contained in the [here](/src/examples) and implement the ZigZag sampler for three different sde.
+We have three examples right now. They are [here](/src/examples) and implement the ZigZag sampler for three different sdes.
 
 ## Developing the ZigZag for a new SDE
 If you want to develop your own sde, you need to:
@@ -35,3 +35,4 @@ the file [faber.jl](src/faber.jl) and (fs_expansion.jl) contains all the functio
 
 ## Tuning the velocities
 TODO
+
