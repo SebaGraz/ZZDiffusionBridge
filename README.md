@@ -1,5 +1,6 @@
 # ZZDiffusionBridge
-ZigZag sampler used to explore the conditional space of a diffusion process. Currently under developmemt.
+ZigZag sampler used to explore the conditional space of a diffusion process. Currently under developmemt. To see and edit the notes see https://www.overleaf.com/2848134699gmmwzrpsyvsx .
+
 
 ## Overview
 the main function introduced (available [here](src/zz_sampler.jl)) is  
