@@ -8,8 +8,6 @@ include("types.jl")
 #functions for Faber Schauder expansion by finite elements representation
 include("fs_expansion.jl")
 
-#Waiting times definition for each model
-include("zz_poisson.jl")
 
 #ZigZag sampler
 include("zz_sampler.jl")
@@ -18,5 +16,5 @@ include("zz_sampler.jl")
 include("plotting.jl")
 
 
-include("main.jl")
+include("examples/example_sin.jl")
 #Experiment
