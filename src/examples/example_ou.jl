@@ -69,7 +69,7 @@ function runall(SHORT = false)
     u = -1.0
     v = 1.0
     X = OUSDE(μ, ν)
-    XX = zigzagsampler(X, T, L, u, v, clock)
+    XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
         f = clock - 1.0; n = 50

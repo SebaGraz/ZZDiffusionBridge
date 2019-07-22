@@ -65,7 +65,7 @@ function runall(Short = false)
     u = - 3π
     v = + 3π
     X = SinSDE(α)
-    XX = zigzagsampler(X, T, L, u, v, clock)
+    XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
         f = clock - 1.0; n = 30

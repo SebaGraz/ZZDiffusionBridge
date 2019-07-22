@@ -101,7 +101,7 @@ function runall(Short = false)
     u = -log(50)/β     # end points in the lamperti transform
     v= -log(1000)/β
     X = LogGrowthSDE(r, K, β)   #end points in the lamperti tranform
-    XX = zigzagsampler(X, T, L, u, v, clock)
+    XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
         f = clock - 1.0; n = 30
