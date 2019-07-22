@@ -31,7 +31,7 @@ If you want to develop your own sde, you need to:
 dependence_strucute(::ModelName) = FullIndependence()
 sampling_scheme(::ModelName) = SubSampling()
 ## Faber-Schauder functions
-the file [faber.jl](src/faber.jl) and (fs_expansion.jl)[src/fs_expansion.jl] contains all the functions necessary to work with the Faber Schauder functions and change of basis to finite element basis. 
+the file [faber.jl](src/faber.jl) and [fs_expansion.jl](src/fs_expansion.jl) contains all the functions necessary to work with the Faber Schauder functions and change of basis to finite element basis. 
 
 ## Tuning the velocities
 TODO
