@@ -4,6 +4,7 @@ ZigZag sampler used to explore the conditional space of a diffusion process. Cur
 ## Overview
 the main function introduced is 
 
+zigzagsampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, TT::Float64, θ = fill(1.0, 2<<L - 1))
 
 It takes a diffusion Model with its parameters, its initial and final point
 
