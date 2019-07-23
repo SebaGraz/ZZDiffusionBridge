@@ -39,3 +39,7 @@ the script [tune_velocities.jl](scripts/tune_velocities.jl) implements computes 
 
 ## Comparisons
 we would like to compare with the **Stochastic gradient Langevin dynamics** [for info here!](https://en.wikipedia.org/wiki/Stochastic_gradient_Langevin_dynamics). This is because, as the methodology we propose, this sampling method use a Monte Carlo estimator for the Gradient of the energy function. The script is [here](scripts/s_langevin_diffusion.jl), you just need to lunch it. You can play around with the parameters: step size `step_size`, number of steps `nstep`, number of skipped jumps before saving `skip`.  The method is extremely simple to implement and the results do not seem that bad. 
+
+## Results!
+some pictures, TODO (very soon) !
+
