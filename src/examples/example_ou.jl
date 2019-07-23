@@ -1,3 +1,4 @@
+include("../ZZDiffusionBridge.jl")
 using LinearAlgebra
 """
     OUSDE <: AbstractModel

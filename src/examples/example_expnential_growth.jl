@@ -1,6 +1,8 @@
 ###################################
 ####    LOGISTIC GROWTH SDE  ######
 ###################################
+include("../ZZDiffusionBridge.jl")
+
 """
     LogGrowthSDE <: AbstractModel
 
