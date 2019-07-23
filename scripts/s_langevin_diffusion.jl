@@ -32,7 +32,7 @@ function stoch_langevin(S::NewSystem, X::AbstractModel, ss, nstep, skip, u, v, n
     Ξ = []
     for i in 1:nstep
         stoch_drift!(S, X, u, v, n)
-        S.ξ .=  S.ξ + S.drift*0.5*ss .+ sqrt(ss)*randn(d)  #otherwise: setfield! immutable struct of type NewSystem cannot be changed
+        S.ξ .=  S.ξ - S.drift*0.5*ss .+ sqrt(ss)*randn(d)  #otherwise: setfield! immutable struct of type NewSystem cannot be changed
 
         if i%skip == 0
             push!(Ξ, copy(S.ξ))
@@ -63,18 +63,18 @@ end
 
 
 function runall(SHORT = false)
-    L = 6
-    T = 50.0
+    L = 7
+    T = 100.0
     S = NewSystem(L, T)
-    α = 1.0
+    α = 0.7
     X = SinSDE(α)
-    ss = 0.001
-    nstep = 10^4
-    skip = 10^2
+    step_size = 0.001
+    nstep = 10^5
+    skip = 10^3
     u = -3.0
     v = 3.0
-    n = 5
-    Y = stoch_langevin(S, X, ss, nstep, skip, u, v, n)
+    n = 1
+    Y = stoch_langevin(S, X, step_size, nstep, skip, u, v, n)
     if SHORT == false
         burning  = 10
         p = plot(leg = false)
