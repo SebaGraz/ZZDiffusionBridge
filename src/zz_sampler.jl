@@ -80,9 +80,9 @@ run the ZigZag sampler for diffusion `X` conditioned to start at `u` and
 end at `v` at time `T`. The infinite summation is truncated at level `L` and
 the ZigZag process will run up to time `TT`. Optionally set velocities θ
 """
-function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64; θ = fill(1.0, 2<<L - 1))
+function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64; ξ =fill(1.0, 2<<L - 1) , θ = fill(1.0, 2<<L - 1))
     t = 0.0
-    S = System(L, T)
+    S = System(L, T, ξ, θ)
     τ0 = 0.0
     n0 = 0
     Ξ = Skeleton[]
@@ -98,5 +98,5 @@ function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float
             update_events!(n0, τ0, S, X, sampling_scheme(X), dependence_strucute(X), false, u, v, t)
         end
     end
-    return Ξ
+    return Ξ 
 end

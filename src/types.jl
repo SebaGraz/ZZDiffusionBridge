@@ -84,8 +84,8 @@ struct System
     V::Vector{Float64} #bad programming
     bound1::Vector{Float64} #bad programming
     bound2::Vector{Float64} #bad programming
-    function System(L::Int64, T::Float64, ξ = fill(0.0, 2<<L - 1), θ = fill(1.0, 2<<L - 1), b1 = fill(0.0, 2<<L - 1), b2 = fill(0.0, 2<<L - 1))
-        new(ξ, θ, generate(L, T), fill(0.0, 2<<L - 1), L, T, b1, b2, fill(0.0, 2<<L - 1), generate_matrix(L, T), generate_vector(L, T), generate_bound1(L,T), generate_bound2(L,T))
+    function System(L::Int64, T::Float64, ξ = fill(0.0, 2<<L - 1), θ = fill(1.0, 2<<L - 1), τ = fill(0.0, 2<<L - 1), b1 = fill(0.0, 2<<L - 1), b2 = fill(0.0, 2<<L - 1))
+        new(ξ, θ, generate(L, T), τ, L, T, b1, b2, fill(0.0, 2<<L - 1), generate_matrix(L, T), generate_vector(L, T), generate_bound1(L,T), generate_bound2(L,T))
     end
 end
 

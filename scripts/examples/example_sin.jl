@@ -1,6 +1,7 @@
 ######################################
 ##############  Sin sde     ##########
 ######################################
+include("../ZZDiffusionBridge.jl")
 
 """
     SinSDE <: AbstractModel
@@ -57,9 +58,9 @@ function λratio(n::Int64, S::System, X::SinSDE, u::Float64, v::Float64, t::Floa
 end
 
 
-function runall(Short = false)
+function runall(SHORT = false)
     T = 200.0
-    clock = 200.0
+    clock = 1000.0
     L = 7
     α = 0.7 #sin
     u = - 3π
@@ -78,5 +79,5 @@ function runall(Short = false)
     return XX
 end
 
-#x = runall()
-#error("STOP HERE")
+x = runall()
+error("STOP HERE")
