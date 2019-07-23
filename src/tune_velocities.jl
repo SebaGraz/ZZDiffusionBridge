@@ -40,32 +40,38 @@ function zz_sampler(S::System, X::AbstractModel, T::Float64, L::Int64, u::Float6
     Ξ, τ0, n0
 end
 
-function piec_lin_integration(y, L)
+
+# the the average of the path over one realization.
+# since the path is piecewise linear. We take the midpoint.
+function piec_lin_integration(y, L, T)
     N = 2<<L
-    W = 1/N
-    somma = 0.5*(y[1] + y[end])*W + sum(y[2:(end-1)])*W
+    somma = 0.5*(y[1] + y[end]) + sum(y[2:(end-1)])
+    return somma*T/N
 end
 
 
-function compute_average(X::Array{Skeleton,1}, sampling_frequncy::Float64, u, v, L)
-    T = X[end].t - 1.0 #0.1 prevents error in the interpolation
-    dt = 1.0:sampling_frequncy:T
+#given an array of skeleton, compute the sample avergae
+# `sampling _frequency`. Discretization given the continuous path
+# L truncation, u, v initial and final points
+function compute_average(X::Array{Skeleton,1}, sampling_frequncy::Float64, u, v, L, T)
+    dt = 0.5:sampling_frequncy:T-0.5 #if you start at 0.0 and finish at T the function Interpolate gives errors
     M = 0
     count = 0
     for i in dt
         ξ = FindCoordinates(X, i).ξ
         ξfe = fs_expansion(ξ, u, v, L, T)
-        path = piec_lin_integration(ξfe, L)
+        path = piec_lin_integration(ξfe, L, T)
         M = M + path
         count += 1
     end
     return M/count
 end
 
-"""
+# experiment: timing each ZigZag of length `clock`. repeat it
+# `rep` times. return the an array with the single repretition and the time
+# β determines the decay of the velocities
+# L truncation level
 
-
-"""
 function vel_experiment(β, L, clock, rep)
     α = 0.5
     T = 200.0
@@ -90,17 +96,11 @@ function vel_experiment(β, L, clock, rep)
     return Y, TIME
 end
 
-function piec_lin_integration(y, L)
-    N = 2<<L
-    W = 1/N
-    somma = 0.5*(y[1] + y[end])*W + sum(y[2:(end-1)])*W
-end
-
 
 
 
 function runall_velocity()
-    rep = 50
+    rep = 20
     clock = 100
     Y = fill(0.0,(6,rep))
     Time = fill(0.0,(6,rep))
@@ -109,7 +109,7 @@ function runall_velocity()
     p = plot()
     for β in 0.0:0.1:0.5
         X, time = vel_experiment(β, L, 100.0, rep)
-        ave = cumsum(compute_average.(X, 1.0, -3π,  3π, L))
+        ave = cumsum(compute_average.(X, 1.0, -3π,  3π, L, T))
         Y[row,:] =  [ave[i]/i for i in 1:rep]
         Time[row, :] = time
         plot!(p, Time[row,:], abs.(Y[row,:]), label =("beta =  $β"))
