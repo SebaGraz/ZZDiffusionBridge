@@ -21,7 +21,9 @@ Three main types are defined ([here](src/types.jl)):
 see the issue [#11](/../../issues/11) for changing system. It contains stuff that may be not used for certain models (ionefficient). Maybe this should be a tuple or we should move all the arguments which are model spcific as attributes of `::Model:<AbstractModel`.
 
 ## Examples
-We have three examples right now. They are [here](/src/examples) and implement the ZigZag sampler for three different sdes.
+We have three examples right now. They are [here](/src/examples) and implement the ZigZag sampler for three different sdes. **how to run them:** 
+1. run src/ZZDiffiusionBridge.jl
+2. run one of files in the folder src/examples/
 
 ## Developing the ZigZag for a new SDE
 If you want to develop your own sde, you need to:
