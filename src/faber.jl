@@ -368,8 +368,8 @@ end
 
 Solve a quadratic equation.
 TODO add errors when the solution is not real.
+solve quadratic equation ax^2 + bx + c = 0
 """
-#solve quadratic equation ax^2 + bx + c = 0
 function Sol2E(a::Float64, b::Float64, c::Float64)
     return (-b + sqrt(b^2 - 4a*c))/2a
 end
