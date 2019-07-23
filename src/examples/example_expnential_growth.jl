@@ -91,7 +91,7 @@ function λratio(n::Int64, S::System, X::LogGrowthSDE, u::Float64, v::Float64, t
 end
 
 
-function runall(Short = false)
+function runall(SHORT = false)
     T = 200.0
     clock = 200.0
     L = 7

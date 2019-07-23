@@ -16,5 +16,5 @@ include("zz_sampler.jl")
 include("plotting.jl")
 
 
-include("examples/example_sin.jl")
 #Experiment
+#include("examples/example_sin.jl")

@@ -1,3 +1,4 @@
+using LinearAlgebra
 """
     OUSDE <: AbstractModel
 
@@ -78,6 +79,7 @@ function runall(SHORT = false)
         p = plotmixing(XX, b, T, L, u, v)
         display(p)
         #plot the mean of the process
+    end
     return XX
 end
 
