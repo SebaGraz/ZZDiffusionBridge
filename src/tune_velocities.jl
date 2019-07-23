@@ -5,12 +5,15 @@ include("ZZDiffusionBridge.jl")
 include("./examples/example_sin.jl")
 
 # see notes section: tune velocities
+# the prefactor (β + 1.0) is just made to make a
+# bit more comparable the experiments
+
 function tune_velocity( L::Int64, β = 0.0)
     θ = fill(0.0, 2<<L - 1)
     k = 1
     for i in 0:L
         for j in 0:2^i-1
-            θ[k] = 2.0^(-i*β)
+            θ[k] =  (3*β + 0.5)*2.0^(-i*β)
             k += 1
         end
     end
@@ -63,8 +66,8 @@ end
 
 
 """
-function vel_experiment(β, L, clock)
-    α = 0.0
+function vel_experiment(β, L, clock, rep)
+    α = 0.5
     T = 200.0
     u = -3π
     v = 3π
@@ -77,7 +80,7 @@ function vel_experiment(β, L, clock)
     Y = []
     TIME = []
     tot_time = 0
-    for i in 1:20
+    for i in 1:rep
         (Ξ, τ0, n0), time = @timed  zz_sampler(S, X, T, L, u, v, clock, τ0, n0)
         #S::System, X::AbstractModel, T::Float64, L::Int64, u, v, clock, τ0 , n0)
         tot_time += time
@@ -97,15 +100,17 @@ end
 
 
 function runall_velocity()
-    Y = fill(0.0,(6,20))
-    Time = fill(0.0,(6,20))
+    rep = 50
+    clock = 100
+    Y = fill(0.0,(6,rep))
+    Time = fill(0.0,(6,rep))
     row = 1
-    L = 7
+    L = 10
     p = plot()
     for β in 0.0:0.1:0.5
-        X, time = vel_experiment(β, L, 500.0)
+        X, time = vel_experiment(β, L, 100.0, rep)
         ave = cumsum(compute_average.(X, 1.0, -3π,  3π, L))
-        Y[row,:] =  [ave[i]/i for i in 1:20]
+        Y[row,:] =  [ave[i]/i for i in 1:rep]
         Time[row, :] = time
         plot!(p, Time[row,:], abs.(Y[row,:]), label =("beta =  $β"))
         row += 1
