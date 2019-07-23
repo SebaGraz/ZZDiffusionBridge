@@ -35,5 +35,5 @@ sampling_scheme(::ModelName) = SubSampling()
 the file [faber.jl](src/faber.jl) and [fs_expansion.jl](src/fs_expansion.jl) contains all the functions necessary to work with the Faber Schauder functions and change of basis to finite element basis. 
 
 ## Tuning the velocities
-TODO
+the script [tune_velocities.jl](src/tune_velocities.jl) implements computes the sample mean of the path integral for the sde dX_t = \alpha sin(X_t)dt + dB_t starting from -3\pi and ending at 3\pi at time 200. By symmetry of the sde, the real mean should be 0 and therefore we can compute the distance between sample and real mean, as a function of the time of the ZigZag sampler. We repeated the experiment for different values of \beta which determines the decay of the velocties 2^(-i\beta) where i is the level. Finally we plot the results.
 
