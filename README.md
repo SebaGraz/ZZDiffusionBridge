@@ -19,7 +19,7 @@ Three main types are defined ([here](src/types.jl)):
 4. the type `System`, container of all the attributes necessary for the sampler
 
 ## Examples
-We have three examples right now. They are [here](/scripts/examples) and implement the ZigZag sampler for three different sdes. **how to run them:** easy, just download the repo and run the script in the folder src/examples 
+We have three examples right now ([here](/scripts/examples) running the ZigZag sampler for three different sdes. **how to run them:** easy, just download the repo and run the script in the folder src/examples 
 
 ## Developing the ZigZag for a new SDE
 If you want to develop your own sde, you need to:
