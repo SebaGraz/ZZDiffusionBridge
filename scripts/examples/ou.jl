@@ -74,13 +74,13 @@ end
 ####
 
 function runall(SHORT = false)
-    T = 5.0
-    clock = 100.0
-    L = 5
+    T = 10.0
+    clock = 500.0
+    L = 6
     ν = 1.0
     μ = -5.0
     u = -1.0
-    v = 1.0
+    v = 2.0
     X = OUSDE(μ, ν, L, T)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
@@ -96,3 +96,6 @@ function runall(SHORT = false)
 end
 
 runall()
+
+error("STOP HERE")
+png("output/ou_1_m5.png")

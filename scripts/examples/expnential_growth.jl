@@ -98,8 +98,8 @@ end
 
 function runall(SHORT = false)
     T = 200.0
-    clock = 200.0
-    L = 7
+    clock = 400.0
+    L = 6
     K = 2000
     r = 0.1
     β = 0.1
@@ -109,7 +109,7 @@ function runall(SHORT = false)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
-        f = clock - 1.0; n = 30
+        f = clock - 1.0; n = 50
         db = (f-burning)/n
         b =  burning:db:f
         p = plotmixing(XX, b, T, L, u, v, x -> exp(- x*β))
@@ -120,4 +120,7 @@ function runall(SHORT = false)
 end
 
 x = runall()
+
+
 error("STOP HERE")
+png("output/exp_growth_01_01_2000.png")

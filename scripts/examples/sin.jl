@@ -57,16 +57,16 @@ end
 
 function runall(SHORT = false)
     T = 100.0
-    clock = 1000.0
+    clock = 10000.0
     L = 6
     α = 0.7 #sin
-    u = - 3π
+    u = - π
     v = + 3π
     X = SinSDE(α)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
-        f = clock - 1.0; n = 30
+        f = clock - 1.0; n = 50
         db = (f-burning)/n
         b =  burning:db:f
         p = plotmixing(XX, b, T, L, u, v)
@@ -77,4 +77,6 @@ function runall(SHORT = false)
 end
 
 x = runall()
+
 error("STOP HERE")
+png("output/sin_07.png")
