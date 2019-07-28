@@ -13,7 +13,7 @@ It takes a diffusion Model with its parameters, its initial and final points `u,
 
 ### Structures
 Three main types are defined ([here](src/types.jl)): 
-1. the asbtarct type `::AbstractModel`, inheriting a specific diffusion model
+1. the asbtarct type `::AbstractModel`, inheriting any specific diffusion model
 2. the abstract type `::AbstractDependenceStructure` inheriting the types of dependences (for our application we have now two subtypes `::FullIndependence` and `::PartialIndependence`) acting as a flag
 3. the abstract type `SamplingScheme` inheriting the types of sampling scheme (`::Regular` and `::PartialIndependence` ) acting as a flag
 4. the type `System`, container of all the attributes necessary for the sampler
