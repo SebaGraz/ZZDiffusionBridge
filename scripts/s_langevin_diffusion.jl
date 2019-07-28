@@ -42,9 +42,6 @@ function stoch_langevin(S::NewSystem, X::AbstractModel, ss, nstep, skip, u, v, n
 end
 
 
-
-
-
 function stoch_drift!(S::NewSystem, X::AbstractModel, u, v, nn)
     for n in 1:2<<S.L-1
         ave = 0.0
@@ -59,18 +56,28 @@ function stoch_drift!(S::NewSystem, X::AbstractModel, u, v, nn)
     end
 end
 
-
+function fs_expansion(S::NewSystem, t::Float64, u::Float64, v::Float64, n = i -> 2^-(1 + i/2))
+        dt = 0:S.T/(2<<S.L):S.T
+        k = (searchsortedfirst(dt, t) - 1)
+        j0 =  Int(ceil(k/2))-1
+        n0 = Faber(S.L, j0)
+        if k % 2 != 0
+                return interpolate([dt[k], dt[k + 1]], fs_expansion(S.ϕ[n0], S.ξ, u, v, S.L, S.T)[1:2], t)
+        else
+                return interpolate([dt[k], dt[k + 1]], fs_expansion(S.ϕ[n0], S.ξ, u, v,  S.L, S.T)[2:3], t)
+        end
+end
 
 
 function runall(SHORT = false)
-    L = 7
+    L = 6
     T = 100.0
     S = NewSystem(L, T)
     α = 0.7
     X = SinSDE(α)
-    step_size = 0.001
-    nstep = 10^5
-    skip = 10^3
+    step_size = 0.002
+    nstep = 2*10^5
+    skip = 4*10^3
     u = -3.0
     v = 3.0
     n = 1
@@ -89,24 +96,7 @@ function runall(SHORT = false)
 end
 
 
-
-
-
-function fs_expansion(S::NewSystem, t::Float64, u::Float64, v::Float64, n = i -> 2^-(1 + i/2))
-        dt = 0:S.T/(2<<S.L):S.T
-        k = (searchsortedfirst(dt, t) - 1)
-        j0 =  Int(ceil(k/2))-1
-        n0 = Faber(S.L, j0)
-        if k % 2 != 0
-                return interpolate([dt[k], dt[k + 1]], fs_expansion(S.ϕ[n0], S.ξ, u, v, S.L, S.T)[1:2], t)
-        else
-                return interpolate([dt[k], dt[k + 1]], fs_expansion(S.ϕ[n0], S.ξ, u, v,  S.L, S.T)[2:3], t)
-        end
-end
-
-
 Y, p = runall()
-png("prova")
-
 
 error("STOP HERE")
+png("output/langevin_sampler_sin_07.png")
