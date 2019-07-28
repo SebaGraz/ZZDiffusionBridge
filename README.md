@@ -36,8 +36,18 @@ the file [faber.jl](src/faber.jl) and [fs_expansion.jl](src/fs_expansion.jl) con
 the script [tune_velocities.jl](scripts/tune_velocities.jl) computes the sample mean of the path integral for the sde dX_t = \alpha sin(X_t)dt + dB_t starting from -3\pi and ending at 3\pi at time 200. By symmetry of the sde, the real mean should be 0 and therefore we can compute the distance between sample and real mean, as a function of the time of the ZigZag sampler. We repeated the experiment for different values of \beta which determines the decay of the velocties 2^(-i\beta) where i is the level. Finally we plot the results. **N.B** this is still unstable and does not bring the desired results. 
 
 ## Comparisons
-we would like to compare with the **Stochastic gradient Langevin dynamics** [for info here!](https://en.wikipedia.org/wiki/Stochastic_gradient_Langevin_dynamics). This is because, as the methodology we propose, this sampling method use a Monte Carlo estimator for the Gradient of the energy function. The script is [here](scripts/s_langevin_diffusion.jl), you just need to run it. You can play around with the parameters: step size `step_size`, number of steps `nstep`, number of skipped jumps before saving `skip`.  The method is extremely simple to implement and the results do not seem that bad. 
+we would like to compare with the **Stochastic gradient Langevin dynamics** [for info here!](https://en.wikipedia.org/wiki/Stochastic_gradient_Langevin_dynamics). This is because, as the methodology we propose, this sampling method use a Monte Carlo estimator for the Gradient of the energy function. The script is [here](scripts/s_langevin_diffusion.jl), you just need to run it. You can play around with the parameters: step size `step_size`, number of steps `nstep`, number of skipped jumps before saving `skip`.  The method is extremely simple to implement and the results do not seem that bad, although you need to tune the discretization step. If it is too little, it does not mix, if it is too large, it diverges from the real density. From here maybe it is worth to implement a Mala (or stochastic mala).
 
 ## Results!
-some pictures, TODO (very soon) !
+sin sde with alpha = 0.7
+![temp](output/sin_07.png)
+
+exponential_growth with r = 0.1, b=0.1 K = 2000
+![temp](output/exp_growth_01_01_2000.png)
+
+Orstein uhlembeck with \mu = -5 and \nu= 1.0
+![temp](output/ou_1_m5.png)
+
+Stochastic Langevin diffusion of sin sde with alpha = 0.7, batch size = 2^(L-1) - 1 
+![temp](output/langevin_sampler_sin_07.png)
 
