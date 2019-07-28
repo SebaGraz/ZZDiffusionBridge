@@ -39,6 +39,7 @@ the script [tune_velocities.jl](scripts/tune_velocities.jl) computes the sample 
 we would like to compare with the **Stochastic gradient Langevin dynamics** [for info here!](https://en.wikipedia.org/wiki/Stochastic_gradient_Langevin_dynamics). This is because, as the methodology we propose, this sampling method use a Monte Carlo estimator for the Gradient of the energy function. The script is [here](scripts/s_langevin_diffusion.jl), you just need to run it. You can play around with the parameters: step size `step_size`, number of steps `nstep`, number of skipped jumps before saving `skip`.  The method is extremely simple to implement and the results do not seem that bad, although you need to tune the discretization step. If it is too little, it does not mix, if it is too large, it diverges from the real density. From here maybe it is worth to implement a Mala (or stochastic mala).
 
 ## Results!
+
 sin sde with alpha = 0.7
 ![temp](output/sin_07.png)
 
