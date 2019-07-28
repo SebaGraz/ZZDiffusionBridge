@@ -41,14 +41,18 @@ we would like to compare with the **Stochastic gradient Langevin dynamics** [for
 ## Results!
 
 sin sde with alpha = 0.7
+
 ![temp](output/sin_07.png)
 
 exponential_growth with r = 0.1, b=0.1 K = 2000
+
 ![temp](output/exp_growth_01_01_2000.png)
 
 Orstein uhlembeck with \mu = -5 and \nu= 1.0
+
 ![temp](output/ou_1_m5.png)
 
 Stochastic Langevin diffusion of sin sde with alpha = 0.7, batch size = 2^(L-1) - 1 
+
 ![temp](output/langevin_sampler_sin_07.png)
 
