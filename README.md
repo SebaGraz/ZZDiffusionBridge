@@ -52,7 +52,7 @@ Orstein uhlembeck with \mu = -5 and \nu= 1.0
 
 ![temp](output/ou_1_m5.png)
 
-Stochastic Langevin diffusion of sin sde with alpha = 0.7, batch size = 2^(L-1) - 1 
+Stochastic gradient Langevin dynamic for the sin sde with alpha = 0.7, batch size = 2^(L-1) - 1 
 
 ![temp](output/langevin_sampler_sin_07.png)
 
