@@ -14,7 +14,3 @@ include("zz_sampler.jl")
 
 #plotting zigzag sampler
 include("plotting.jl")
-
-
-#Experiment
-#include("examples/example_sin.jl")

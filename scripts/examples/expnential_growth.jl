@@ -1,7 +1,4 @@
-###################################
-####    LOGISTIC GROWTH SDE  ######
-###################################
-include("../ZZDiffusionBridge.jl")
+include("../../src/ZZDiffusionBridge.jl")
 
 """
     LogGrowthSDE <: AbstractModel
@@ -10,6 +7,9 @@ dX_t = r X_t (1- X_t/K) dt + β X_t dB_t
 r := exponential growth
 K := saturation parameter
 β := multiplicative noise factor
+a1 := 2*r*r/(β*K) factor often used
+a2 := a1/K  factor often used
+b1,b2, tt := needed for lambda ratio
 """
 struct LogGrowthSDE <: AbstractModel
     r::Float64
@@ -17,8 +17,11 @@ struct LogGrowthSDE <: AbstractModel
     β::Float64
     a1::Float64 #precomputing some useful factors
     a2::Float64 #precomputing some useful factors
-    function LogGrowthSDE(r, K, β)
-        new(r, K, β, 2*r*r/(β*K) , 2*r*r/(β*K*K))
+    b1::Vector{Float64} #free vectors
+    b2::Vector{Float64} #free vectors
+    tt::Vector{Float64} #free vectors
+    function LogGrowthSDE(r, K, β, L)
+        new(r, K, β, 2*r*r/(β*K) , 2*r*r/(β*K*K), fill(0.0, 2<<L -1), fill(0.0, 2<<L -1), fill(0.0, 2<<L -1))
     end
 end
 
@@ -63,14 +66,14 @@ of model `LogGrowthSDE` starting at `u` and ending at `v`
 """
 function λbar(n, S::System, X::LogGrowthSDE , u::Float64, v::Float64, t::Float64)
     w1 = waitgaus(S.ξ[n], S.θ[n], rand())
-    S.b1[n] = minimum(fs_expansion(S.ϕ[n], S.ξ, u, v, S.L, S.T))
-    S.b2[n] = minimum(fs_expansion(S.ϕ[n], S.θ, u, v, S.L, S.T))
-    S.tt[n] = t
+    X.b1[n] = minimum(fs_expansion(S.ϕ[n], S.ξ, u, v, S.L, S.T))
+    X.b2[n] = minimum(fs_expansion(S.ϕ[n], S.θ, u, v, S.L, S.T))
+    X.tt[n] = t
     if S.θ[n] > 0
-        w2 = waitexp(0.5*S.ϕ[n].δ*X.a1*exp(-X.β*S.b1[n]), -X.β*S.b2[n], rand())
+        w2 = waitexp(0.5*S.ϕ[n].δ*X.a1*exp(-X.β*X.b1[n]), -X.β*X.b2[n], rand())
         return min(w1,w2)
     else
-        w2 = waitexp(0.5*S.ϕ[n].δ*X.a2*exp(-2X.β*S.b1[n]), -2X.β*S.b2[n], rand())
+        w2 = waitexp(0.5*S.ϕ[n].δ*X.a2*exp(-2X.β*X.b1[n]), -2X.β*X.b2[n], rand())
         return min(w1, w2)
     end
 end
@@ -83,12 +86,12 @@ accept reject time drwan from upper bound λbar relative to the coefficient `n`
 of model `LogGrowthSDE` starting at `u` and ending at `v`
 """
 function λratio(n::Int64, S::System, X::LogGrowthSDE, u::Float64, v::Float64, t::Float64)
-    time = t - S.tt[n]
+    time = t - X.tt[n]
     ω = MCintegration(S.ϕ[n])
     XX = fs_expansion(S, ω, u, v)
     ϕ = Λ(ω, S.ϕ[n].i, S.ϕ[n].j, S.T)   #need to be changed
     num = max(0, S.θ[n]*(0.5*S.ϕ[n].range*ϕ*(X.a1*exp(-X.β*XX) - X.a2*exp(-2X.β*XX)) + S.ξ[n]))
-    den = max(0, S.θ[n]*S.ξ[n]) + max(0, 0.5*S.θ[n]*S.ϕ[n].δ*X.a1*exp(-X.β*S.b1[n])*exp(-X.β*S.b2[n]*time)) + max(0, -0.5*S.θ[n]*S.ϕ[n].δ*X.a2*exp(-2X.β*S.b1[n])*exp(-2X.β*S.b2[n]*time))
+    den = max(0, S.θ[n]*S.ξ[n]) + max(0, 0.5*S.θ[n]*S.ϕ[n].δ*X.a1*exp(-X.β*X.b1[n])*exp(-X.β*X.b2[n]*time)) + max(0, -0.5*S.θ[n]*S.ϕ[n].δ*X.a2*exp(-2X.β*X.b1[n])*exp(-2X.β*X.b2[n]*time))
     return num/den
 end
 
@@ -102,7 +105,7 @@ function runall(SHORT = false)
     β = 0.1
     u = -log(50)/β     # end points in the lamperti transform
     v= -log(1000)/β
-    X = LogGrowthSDE(r, K, β)   #end points in the lamperti tranform
+    X = LogGrowthSDE(r, K, β, L)   #end points in the lamperti tranform
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning

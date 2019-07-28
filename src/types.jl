@@ -65,10 +65,6 @@ contains all the information needed for the ZigZag sampler
     b1::Vector{Float64} := free vector needed for linear growth sde
     b2::Vector{Float64} := free vector needed for linear growth sde
     tt::Vector{Float64} := free vector needed for linear growth sde
-    M::Array{Float64, 2} := free matrix needed for OU
-    V::Vector{Float64} :=  free vector needed for OU sde
-    bound1::Vector{Float64} :=  free vector needed for OU sde
-    bound2::Vector{Float64} :=  free vector needed for OU sde
 """
 struct System
     ξ::Vector{Float64} #
@@ -77,15 +73,8 @@ struct System
     τ::Vector{Float64}
     L::Int64
     T::Float64
-    b1::Vector{Float64} #bad programming
-    b2::Vector{Float64} #bad programming
-    tt::Vector{Float64} #bad programming
-    M::Array{Float64, 2} #bad programming
-    V::Vector{Float64} #bad programming
-    bound1::Vector{Float64} #bad programming
-    bound2::Vector{Float64} #bad programming
-    function System(L::Int64, T::Float64, ξ = fill(0.0, 2<<L - 1), θ = fill(1.0, 2<<L - 1), τ = fill(0.0, 2<<L - 1), b1 = fill(0.0, 2<<L - 1), b2 = fill(0.0, 2<<L - 1))
-        new(ξ, θ, generate(L, T), τ, L, T, b1, b2, fill(0.0, 2<<L - 1), generate_matrix(L, T), generate_vector(L, T), generate_bound1(L,T), generate_bound2(L,T))
+    function System(L::Int64, T::Float64, ξ = fill(0.0, 2<<L - 1), θ = fill(1.0, 2<<L - 1), τ = fill(0.0, 2<<L - 1))
+        new(ξ, θ, generate(L, T), τ, L, T)
     end
 end
 

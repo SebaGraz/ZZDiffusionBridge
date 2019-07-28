@@ -1,4 +1,4 @@
-include("../ZZDiffusionBridge.jl")
+include("../../src/ZZDiffusionBridge.jl")
 using LinearAlgebra
 """
     OUSDE <: AbstractModel
@@ -6,10 +6,21 @@ using LinearAlgebra
 dX_t = ν(μ - X_t)dt + dB_t
 ν := intensity
 μ := mean reversion
+M::Array{Float64, 2} := matrix whose element i,j is equal to ∫_0^T ϕ_i ϕ_j dt
+V::Vector{Float64} :=  vector whose element i is equal to ∫_0^T ϕ_i dt
+bound1::Vector{Float64} :=  vector whose element i is equal to ∫_0^T upbar{ϕ}_i ϕ_j dt
+bound2::Vector{Float64} :=  vector whose element i is equal to ∫_0^T downbar{ϕ}_i ϕ_j dt
 """
 struct OUSDE <: AbstractModel
     μ::Float64
     ν::Float64
+    M::Array{Float64, 2}
+    V::Vector{Float64}
+    bound1::Vector{Float64}
+    bound2::Vector{Float64}
+    function OUSDE(μ, ν, L, T)
+        new(μ, ν, generate_matrix(L, T), generate_vector(L, T), generate_bound1(L,T), generate_bound2(L,T))
+    end
 end
 
 dependence_strucute(::OUSDE) = PartialIndependence()
@@ -55,8 +66,8 @@ of model `OUSDE` starting at `u` and ending at `v`
 λbar = λ No upper bound and no accept reject step
 """
 function λbar(n, S::System, X::OUSDE , u::Float64, v::Float64, t::Float64)
-    a = S.θ[n]*(X.ν*X.ν*(dot(S.M[n,:], S.ξ) + S.bound1[n]*v + S.bound2[n]*u - X.μ*S.V[n]) + S.ξ[n])
-    b = S.θ[n]*((dot(S.M[:,n], S.θ))*X.ν*X.ν + S.θ[n])
+    a = S.θ[n]*(X.ν*X.ν*(dot(X.M[n,:], S.ξ) + X.bound1[n]*v + X.bound2[n]*u - X.μ*X.V[n]) + S.ξ[n])
+    b = S.θ[n]*((dot(X.M[:,n], S.θ))*X.ν*X.ν + S.θ[n])
     return wait_gengaus(a, b, rand())
 end
 
@@ -70,7 +81,7 @@ function runall(SHORT = false)
     μ = -5.0
     u = -1.0
     v = 1.0
-    X = OUSDE(μ, ν)
+    X = OUSDE(μ, ν, L, T)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning

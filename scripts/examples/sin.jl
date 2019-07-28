@@ -1,7 +1,4 @@
-######################################
-##############  Sin sde     ##########
-######################################
-include("../ZZDiffusionBridge.jl")
+include("../../src/ZZDiffusionBridge.jl")
 
 """
     SinSDE <: AbstractModel
@@ -59,9 +56,9 @@ end
 
 
 function runall(SHORT = false)
-    T = 200.0
+    T = 100.0
     clock = 1000.0
-    L = 7
+    L = 6
     α = 0.7 #sin
     u = - 3π
     v = + 3π

@@ -80,9 +80,9 @@ function runall(SHORT = false)
         p = plot(leg = false)
         dt = 0:T/2<<L:T
         for i in burning:length(Y)
-            plot!(p, dt, fs_expansion(Y[i], u, v, L, T))
+            plot!(p, dt, fs_expansion(Y[i], u, v, L, T),  color= RGB(i/length(Y), 0.4, 1-i/length(Y)), linewidth=0.3, alpha = 0.4)
         end
-        hline!(p, [n*π for n in -5:2:5])
+        hline!(p, [n*π for n in -7:2:7])
         display(p)
     end
     return Y, p
@@ -106,7 +106,7 @@ end
 
 
 Y, p = runall()
+png("prova")
 
 
-
-error("")
+error("STOP HERE")
