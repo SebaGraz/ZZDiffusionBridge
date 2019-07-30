@@ -13,13 +13,13 @@ It takes a diffusion Model with its parameters, its initial and final points `u,
 
 ### Structures
 Three main types are defined ([here](src/types.jl)): 
-1. the asbtarct type `::AbstractModel`, inheriting a specific diffusion model
+1. the asbtarct type `::AbstractModel`, inheriting any specific diffusion model
 2. the abstract type `::AbstractDependenceStructure` inheriting the types of dependences (for our application we have now two subtypes `::FullIndependence` and `::PartialIndependence`) acting as a flag
 3. the abstract type `SamplingScheme` inheriting the types of sampling scheme (`::Regular` and `::PartialIndependence` ) acting as a flag
 4. the type `System`, container of all the attributes necessary for the sampler
 
 ## Examples
-We have three examples right now. They are [here](/scripts/examples) and implement the ZigZag sampler for three different sdes. **how to run them:** easy, just download the repo and run the script in the folder src/examples 
+We have three examples right now ([here](/scripts/examples) running the ZigZag sampler for three different sdes. **how to run them:** easy, just download the repo and run the script in the folder src/examples 
 
 ## Developing the ZigZag for a new SDE
 If you want to develop your own sde, you need to:
@@ -39,15 +39,20 @@ the script [tune_velocities.jl](scripts/tune_velocities.jl) computes the sample 
 we would like to compare with the **Stochastic gradient Langevin dynamics** [for info here!](https://en.wikipedia.org/wiki/Stochastic_gradient_Langevin_dynamics). This is because, as the methodology we propose, this sampling method use a Monte Carlo estimator for the Gradient of the energy function. The script is [here](scripts/s_langevin_diffusion.jl), you just need to run it. You can play around with the parameters: step size `step_size`, number of steps `nstep`, number of skipped jumps before saving `skip`.  The method is extremely simple to implement and the results do not seem that bad, although you need to tune the discretization step. If it is too little, it does not mix, if it is too large, it diverges from the real density. From here maybe it is worth to implement a Mala (or stochastic mala).
 
 ## Results!
+
 sin sde with alpha = 0.7
+
 ![temp](output/sin_07.png)
 
 exponential_growth with r = 0.1, b=0.1 K = 2000
+
 ![temp](output/exp_growth_01_01_2000.png)
 
 Orstein uhlembeck with \mu = -5 and \nu= 1.0
+
 ![temp](output/ou_1_m5.png)
 
-Stochastic Langevin diffusion of sin sde with alpha = 0.7, batch size = 2^(L-1) - 1 
+Stochastic gradient Langevin dynamic for the sin sde with alpha = 0.7, batch size = 2^(L-1) - 1 
+
 ![temp](output/langevin_sampler_sin_07.png)
 
