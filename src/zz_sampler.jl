@@ -40,6 +40,19 @@ function update_events!(n::Int64, τ0::Float64, S::System, X::AbstractModel, ::S
 end
 
 
+
+
+
+
+function update_events!(n::Int64, τ0::Float64, S::System, X::AbstractModel, f1::Regular, f2::PartialIndependence, acc::Bool, u::Float64, v::Float64, t::Float64)
+    for i in S.ϕ[n].nhb
+        S.τ[i] = λbar(i, S, X , u, v, t)
+    end
+    for i in S.ϕ[n].notnhb
+        S.τ[i] -= τ0
+    end
+end
+
 """
     update_events!(n, S::System, X::AbstractModel, f1::Regular, f2::PartialIndependence, acc)
 
@@ -98,5 +111,5 @@ function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float
             update_events!(n0, τ0, S, X, sampling_scheme(X), dependence_strucute(X), false, u, v, t)
         end
     end
-    return Ξ 
+    return Ξ
 end
