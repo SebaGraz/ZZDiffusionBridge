@@ -76,7 +76,7 @@ function runall(SHORT = false)
     return XX
 end
 
+error("STOP HERE")
 x = runall()
 
-error("STOP HERE")
 png("output/sin_07.png")

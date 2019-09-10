@@ -95,7 +95,7 @@ function runall(SHORT = false)
     return XX
 end
 
+error("STOP HERE")
 runall()
 
-error("STOP HERE")
 png("output/ou_1_m5.png")

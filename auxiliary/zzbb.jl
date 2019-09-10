@@ -75,8 +75,8 @@ end
 
 
 
+error("STOP HERE")
 
 runall(false)
 
-error("STOP HERE")
 png("../output/bm00.png")

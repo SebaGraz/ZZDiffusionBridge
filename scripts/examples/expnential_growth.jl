@@ -119,8 +119,9 @@ function runall(SHORT = false)
     return XX
 end
 
+error("STOP HERE")
+
 x = runall()
 
 
-error("STOP HERE")
 png("output/exp_growth_01_01_2000.png")
