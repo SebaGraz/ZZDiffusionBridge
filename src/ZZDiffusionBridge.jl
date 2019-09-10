@@ -1,4 +1,4 @@
-
+using Random
 #Faber Schauder Functions structure
 include("faber.jl")
 

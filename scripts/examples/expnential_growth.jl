@@ -95,7 +95,7 @@ function λratio(n::Int64, S::System, X::LogGrowthSDE, u::Float64, v::Float64, t
     return num/den
 end
 
-
+Random.seed!(1)
 function runall(SHORT = false)
     T = 200.0
     clock = 400.0

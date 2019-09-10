@@ -72,7 +72,7 @@ function λbar(n, S::System, X::OUSDE , u::Float64, v::Float64, t::Float64)
 end
 
 ####
-
+Random.seed!(1)
 function runall(SHORT = false)
     T = 10.0
     clock = 500.0

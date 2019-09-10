@@ -54,7 +54,7 @@ function λratio(n::Int64, S::System, X::SinSDE, u::Float64, v::Float64, t::Floa
     return max(0, S.θ[n]*(0.5*S.ϕ[n].range*λ*(X.α*X.α*sin(2.0*(XX)) - X.α*sin(XX)) + S.ξ[n]))/(abs(S.θ[n])*δ + max(0, S.θ[n]*S.ξ[n]))
 end
 
-
+Random.seed!(1)
 function runall(SHORT = false)
     T = 100.0
     clock = 10000.0
