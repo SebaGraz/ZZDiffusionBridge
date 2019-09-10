@@ -60,7 +60,7 @@ function runall(SHORT = false)
     L = 8
     u = 0.0
     v = 0.0
-    @time XX = zz_sampler(BB(), T, L, u, v, clock)
+    XX = zz_sampler(BB(), T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
         f = clock - 1.0; n = 200
