@@ -56,17 +56,19 @@ using Random
 Random.seed!(1)
 function runall(SHORT = false)
     T = 1.0
-    clock = 500.0
-    L = 8
+    clock = 300.0
+    L = 6
     u = 0.0
     v = 0.0
     XX = zz_sampler(BB(), T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
-        f = clock - 1.0; n = 200
+        f = clock - 1.0; n =100
         db = (f-burning)/n
         b =  burning:db:f
         p = plotmixing(XX, b, T, L, u, v)
+        xaxis!(p, "t")
+        yaxis!(p, "X_t")
         display(p)
         #plot the mean of the process
     end
@@ -77,6 +79,6 @@ end
 
 error("STOP HERE")
 
-runall(false)
+runall()
 
-png("../output/bm00.png")
+savefig("../../output/bm00.pdf")
