@@ -72,7 +72,7 @@ end
         fs_expansion(S::System, t::Float64, u, v, n = i -> 2^-(1 + i/2))
 
 Find value of the process (Piecewise linear) for any t ∈ [0, T]
-do not evaluate the  whole path, but just the points needed for t
+does not evaluate the  whole path, but just the points needed for t
 """
 function fs_expansion(S::System, t::Float64, u::Float64, v::Float64, n = i -> 2^-(1 + i/2))
         dt = 0:S.T/(2<<S.L):S.T

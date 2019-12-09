@@ -95,13 +95,25 @@ function λratio(n::Int64, S::System, X::LogGrowthSDE, u::Float64, v::Float64, t
     return num/den
 end
 
-Random.seed!(1)
+function sol_exp_growth(u, r, k, T)
+    C = u*k/(k - u)
+    time = 0:0.001:T
+    y = zeros(length(time))
+    j = 1
+    for i in time
+        y[j] = C*exp(r*i)/(1 + C/k*exp(r*i))
+        j = j + 1
+    end
+    return (time, y)
+end
+
 function runall(SHORT = false)
+    Random.seed!(1)
     T = 200.0
-    clock = 400.0
+    clock = 200.0
     L = 6
     K = 2000
-    r = 0.1
+    r = 0.08
     β = 0.1
     u = -log(50)/β     # end points in the lamperti transform
     v= -log(1000)/β
@@ -109,11 +121,13 @@ function runall(SHORT = false)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
-        f = clock - 1.0; n = 50
+        f = clock - 1.0; n = 100
         db = (f-burning)/n
         b =  burning:db:f
         p = plotmixing(XX, b, T, L, u, v, x -> exp(- x*β))
-        hline!(p, [K])
+        plot!(p, sol_exp_growth(50, r, K, T), color = :blue)
+        xaxis!(p, "t")
+        yaxis!(p, "X_t")
         display(p)
     end
     return XX
@@ -122,6 +136,4 @@ end
 error("STOP HERE")
 
 x = runall()
-
-
-png("output/exp_growth_01_01_2000.png")
+savefig("../../output/exp_growth_01_01_2000.pdf")

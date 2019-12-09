@@ -30,6 +30,7 @@ sampling_scheme(::OUSDE) = Regular()
 
 #Poisson rates
 """
+    wait_gengaus(a,b,u)
 obtaining waiting time for Inhomogeneous Poisson Process
 with rate of the form λ(t) = (a + b*t)^+, `a`,`b` ∈ R, `u` random variable
 """
@@ -72,23 +73,26 @@ function λbar(n, S::System, X::OUSDE , u::Float64, v::Float64, t::Float64)
 end
 
 ####
-Random.seed!(1)
 function runall(SHORT = false)
+    Random.seed!(1)
     T = 10.0
-    clock = 500.0
+    clock = 1000.0
     L = 6
     ν = 1.0
-    μ = -5.0
+    μ = -5
     u = -1.0
     v = 2.0
     X = OUSDE(μ, ν, L, T)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
-        f = clock - 1.0; n = 50
+        f = clock - 1.0; n = 100
         db = (f-burning)/n
         b =  burning:db:f
         p = plotmixing(XX, b, T, L, u, v)
+        hline!(p, [-5.0], color = :blue)
+        xaxis!(p, "t")
+        yaxis!(p, "X_t")
         display(p)
         #plot the mean of the process
     end
@@ -96,6 +100,6 @@ function runall(SHORT = false)
 end
 
 error("STOP HERE")
-runall()
 
-png("output/ou_1_m5.png")
+runall()
+savefig("../../output/ou_1_m5.pdf")
