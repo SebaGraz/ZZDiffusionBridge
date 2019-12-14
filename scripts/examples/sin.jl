@@ -62,9 +62,9 @@ function λratio(n::Int64, S::System, X::SinSDE, u::Float64, v::Float64, t::Floa
 end
 
 function runall(SHORT = false)
-    Random.seed!(1)
+    Random.seed!(0)
     T = 50.0
-    clock = 20000.0
+    clock = 10000.0
     L = 6
     α = 0.7#sin
     u = - Float64(π)
@@ -73,7 +73,7 @@ function runall(SHORT = false)
     XX = zz_sampler(X, T, L, u, v, clock)
     if SHORT == false
         burning = 10.0    #burning
-        f = clock - 1.0; n = 100
+        f = clock - 1.0; n = 200
         db = (f-burning)/n
         b =  burning:db:f
         p = plotmixing(XX, b, T, L, u, v)
@@ -85,16 +85,15 @@ function runall(SHORT = false)
     return XX
 end
 error("STOP HERE")
-Random.seed!(1)
-x = runall(false)
+x = runall()
 savefig("../../output/sin_07.pdf")
 
 function qqplot_coef(xx, levels, burn)
     y = Vector{Float64}[]
     T = xx[end].t - 1
-    time = burn:10.0:T
+    time = burn:1.0:T
     for ii in levels
-        n = Faber(ii, ii)
+        n = Faber(ii, 0)
         x = []
         for i in time
             push!(x, FindCoordinates(xx, i).ξ[n])
@@ -109,9 +108,8 @@ burn = 100
 qq = qqplot_coef(x, levels, burn)
 #qqplot(Normal, qq[1], label = "level 1", legend = :topleft)
 using Distributions
-using StatPlots
-plot()
-plot(qqplot(Normal, qq[1], label = "level 0", legend = :topleft, alpha = 0.2), qqplot(Normal, qq[2], label = "level 1", legend = :topleft, alpha = 0.2), qqplot(Normal, qq[3], label = "level 2", legend = :topleft, alpha = 0.2),  size = (500,250),layout = (1,3))
+using StatsPlots
+plot(qqplot(Normal, qq[1], label = "level 0", legend = :topleft, alpha = 0.2), qqplot(Normal, qq[2], label = "level 1", legend = :topleft, alpha = 0.1), qqplot(Normal, qq[3], label = "level 2", legend = :topleft, alpha = 0.2),  size = (500,250),layout = (1,3))
 
 savefig("../../output/qqplots2.pdf")
 

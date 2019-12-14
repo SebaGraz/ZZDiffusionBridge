@@ -1,4 +1,4 @@
-using StatPlots
+using StatsPlots
 using Distributions
 using KernelDensity
 
@@ -39,7 +39,7 @@ end
 midp = midpoint_sample(Ξ, u, v, T)
 #a = histogram(midp)
 x = kde(midp)
-aa = plot(x.x,x.density, label = "empirical distribution")
+aa = plot(x.x,x.density, leg = false)
 
 
 #### Real density
@@ -87,4 +87,4 @@ end
 
 
 plot!(aa, Normal(μ, sqrt(σ)), label = "true distribution")
-savefig("../../output/midpoint.pdf")
+savefig("../../output/midpoint.png")

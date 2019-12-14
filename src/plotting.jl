@@ -25,7 +25,7 @@ function plotmixing(y::Array{Skeleton,1}, b, T::Float64, L::Int64, u::Float64, v
     j = 1
     for i in b
         dx = fs_expansion(FindCoordinates(y, i).ξ, u, v, L, T)
-        Plots.plot!(p, dt, trasform.(dx),  line_z = j, linewidth=0.3, alpha = 0.4)
+        Plots.plot!(p, dt, trasform.(dx),  line_z = j, linewidth=0.3, alpha = 0.2)
         j = j + 1
     end
     return p
