@@ -173,6 +173,20 @@ function acc_rej2(∇U_tilde::Vector{Float64}, global_bound::Float64, θ::Vector
 end
 
 """
+    Λ(ϕ_n::Fs, t::Float64)
+fast way to evaluate a basis function `ϕ_n` at a point t (inside its support)
+"""
+function  Λ(ϕ_n::Fs, t::Float64)
+    ϕm = (ϕ_n.lb + ϕ_n.ub)*0.5
+    if t < ϕm
+        (t - ϕ_n.lb)*ϕ_n.supr/(ϕm - ϕ_n.lb)
+    else
+        (ϕ_n.ub - t)*ϕ_n.supr/(ϕ_n.ub - ϕm)
+    end
+end
+
+
+"""
     ∇U_tilde(ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
 
 accept reject time drwan from upper bound λbar relative to the coefficient `n`
@@ -181,14 +195,16 @@ of model `SinSDE` starting at `u` and ending at `v`
 function ∇U_tilde(ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
     ∇U_tilde = zeros(length(ϕ))
     for n in 1:length(ϕ)
-        #δ = ϕ[n].range*(X.α*X.α + X.α)*0.5 Not used
         t = MCintegration(ϕ[n])
         XX = fs_expansion(t, ξ, ϕ, u, v, L, T)
-        ϕ_t = Λ(t, ϕ[n].i, ϕ[n].j, T)
+        ϕ_t = Λ(ϕ[n], t)
         ∇U_tilde[n] = 0.5*ϕ[n].range*ϕ_t*(α*α*sin(2.0*(XX)) - α*sin(XX))
     end
     return ∇U_tilde
 end
+
+
+
 
 function acc_rej(∇U_tilde::Vector{Float64}, θ::Vector{Float64})
     max(0, ∇U_tilde*θ)/(a + b*τ)
@@ -268,7 +284,7 @@ T = 50.0
 u = Float64(-π)
 v =  Float64(3π)
 L = 6
-clock = 5000.0
+clock = 10000.0
 Ξ = boomerang_sampler_sin(T, L, u, v, clock)
 
 error("STOP HERE")
@@ -309,9 +325,9 @@ end
 
 
 using Plots
-b = 20:1.0:990
+b = 20:10.0:clock-.1
 length(b)
 plot_boomerang(Ξ, b, L, T, u, v)
 
 
-savefig("boomerang/sin_boom2.png")
+savefig("boomerang/sin_boom.png")
