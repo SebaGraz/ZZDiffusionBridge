@@ -1,7 +1,6 @@
-
 include("../ZZDiffusionBridge.jl")
 using LinearAlgebra
-using JLD
+
 # in order to recostruct the path we need time and velocity at event time
 """
         struct Skeleton2
@@ -13,7 +12,6 @@ using JLD
 structure for saving the output of the process. `ξ` position, `θ` velocity, `t` time
 """
 struct Skeleton2
-    ξ::Vector{Float64} #does saving take time?
     θ::Vector{Float64}
     t::Float64
 end
@@ -115,6 +113,7 @@ end
     wait_linear(a,b,u)
 obtaining waiting time for Inhomogeneous Poisson Process
 with rate of the form λ(t) = (a + b*t)^+, `a`,`b` ∈ R, `u` random variable
+### CHANGE NAME
 """
 function wait_linear(a::Float64, b::Float64, u::Float64)
     if b > 0
@@ -189,7 +188,6 @@ contour reflections
 function R(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
     return θ - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde
 end
-
 
 
 function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
