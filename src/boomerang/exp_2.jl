@@ -219,11 +219,11 @@ end
 accept reject time drwan from upper bound λbar relative to the coefficient `n`
 of model `SinSDE` starting at `u` and ending at `v`
 """
-function ∇U_tilde_ind(i0::Int64, ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
+function ∇U_tilde_ind!(∇Utilde::Vector{Float64} ,i0::Int64, ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
         t = MCintegration(ϕ[i0])
         XX = fs_expansion(t, ξ, ϕ, u, v, L, T)
         ϕ_t = Λ(ϕ[i0], t)
-        return 0.5*ϕ[i0].range*ϕ_t*(α*α*sin(2.0*(XX)) - α*sin(XX))
+        ∇Utilde[i0] = 0.5*ϕ[i0].range*ϕ_t*(α*α*sin(2.0*(XX)) - α*sin(XX))
 end
 
 
@@ -276,7 +276,8 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
     #if Q_try != Q_try'
     #    error("Q not symmetric")
     #end  # does not depend on x, v so precompile till here
-    ∇Utilde = [∇U_tilde_ind(i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
+    ∇Utilde = zeros(N)
+    [∇U_tilde_ind!(∇Utilde, i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
     ∇Ubar = ∇U_bar(α, ϕ, L, T)# does not depend on x, v so precompile
     λ_bar =  [λbar_ind(ξ[i], θ[i], ∇Ubar[i]) for i in 1:N] #vector
     τ = event_λ_const.(λ_bar) #vector
@@ -300,7 +301,7 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref -= τ0
-            ∇Utilde[i0] = ∇U_tilde_ind(i0, ξ, ϕ, α, L, T, u, v) #TODO
+            ∇U_tilde_ind!(i0, ξ, ϕ, α, L, T, u, v) #TODO
             acc_ratio = max(∇Utilde[i0]*θ[i0], 0)/λ_bar[i0] #max not necessary
             #if   !(0 <= acc_ratio < 1) #DEBUG
                 #println("λ_bar: ", λ_bar)

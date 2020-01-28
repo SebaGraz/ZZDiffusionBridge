@@ -4,10 +4,9 @@ include("../../boomerang/exp_3.jl")
 include("../../boomerang/exp_2.jl")
 include("../../boomerang/exp_1.jl")
 """
-Takes a oredered vector `v` with ordering `p` (ordered from the second element
-from the smallest value to the biggest).
+Takes a quasi-oredered vector `v` with ordering `p` (ordered from the second element of v).
 Update the ordering such that also the first element is ordered as above. This function replaces
-findmin() which should be more expensives.
+findmin() which should be computationally more expensives.
 #TODO generaliz for the ith compoment
 """
 function first_event_ordering(v::Vector{Float64}, p::Vector{Int64})
@@ -35,10 +34,6 @@ end
 #     end
 # end
 
-
-
-
-
 function local_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
     Random.seed!(0)
     N = 2^(L+1)-1
@@ -47,7 +42,8 @@ function local_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Float
     t = 0.0
     ϕ = generate(L, T)
     #initialize quantities
-    ∇Utilde = [∇U_tilde_ind(i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
+    ∇Utilde = zeros(N)
+    [∇U_tilde_ind!(∇Utilde , i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
     ∇Ubar = ∇U_bar(α, ϕ, L, T)# does not depend on x, v so precompile
     λ_bar =  [λbar_ind(ξ[i], θ[i], ∇Ubar[i]) for i in 1:N] #vector
     τ = event_λ_const.(λ_bar) #vector
@@ -79,28 +75,19 @@ function local_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Float
             τ[i_ref0] = event_λ_const(λ_bar[i_ref0])
             τ_ref[i_ref0] = event_λ_const(c)
             first_event_ordering(τ_ref, p_ref)
-            p = sortperm(τ) #TODO # I have to substitute this step
+            p = sortperm(τ) #TOCHANGE # I have to substitute this step
         else
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref .-= τ0
-            ∇Utilde[i0] = ∇U_tilde_ind(i0, ξ, ϕ, α, L, T, u, v)
+            ∇U_tilde_ind!(∇Utilde, i0, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(∇Utilde[i0]*θ[i0], 0)/λ_bar[i0] #max not necessary
-            #if   !(0 <= acc_ratio < 1) #DEBUG
-                #println("λ_bar: ", λ_bar)
-                #println("lambda tilde ",  max(dot(∇Utilde, θ), 0))
-                #println("acc_ratio: ", acc_ratio)
-                #error("invalid acc/rej ratio")
-            #end
             if acc_ratio > rand()
-                #println("STEP: ok accept event time with prob: ", acc_ratio)
                 θ[i0] = -θ[i0]
                 push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
                 λ_bar[i0] = λbar_ind(ξ[i0], θ[i0], ∇Ubar[i0])
                 τ[i0] = event_λ_const(λ_bar[i0])
             else
-                #println("STEP: ok acc_ratio, reject event time"
-                # λ_bar = λbar2(ξ, θ, ∇Ubar) It is not needed
                 τ[i0] = event_λ_const(λ_bar[i0])
             end
             for i in 1:(i0-1)
@@ -116,8 +103,6 @@ function local_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Float
     end
     return Ξ
 end
-#### OK we need just to change  one line ####
-
 
 function mixed_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
     Random.seed!(0)
@@ -210,7 +195,7 @@ function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Floa
     while t < clock
         if τ_ref < τ0
             #println("STEP: refreshment")
-            ξ[:], θ[:] =  boomerang_traj(ξ, θ, τ_ref)
+            ξ, θ =  boomerang_traj(ξ, θ, τ_ref)
             t += τ_ref
             θ[:] = randn(length(θ))
             push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
@@ -218,10 +203,10 @@ function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Floa
             τ0 = event_λ_const(λ_bar)
             τ_ref = event_λ_const(c)
         else
-            ξ[:], θ[:] =  boomerang_traj(ξ, θ, τ0)
+            ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref -= τ0
-            ∇Utilde[:] = ∇U_tilde(ξ, ϕ, α, L, T, u, v)
+            ∇U_tilde!(∇Utilde, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(dot(∇Utilde, θ), 0)/λ_bar
             #if   !(0 <= acc_ratio < 1) #DEBUG
                 #println("λ_bar: ", λ_bar)

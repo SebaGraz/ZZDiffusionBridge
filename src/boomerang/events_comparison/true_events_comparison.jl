@@ -147,6 +147,9 @@ function boomerang_count_ind_ref(α::Float64, T::Float64, L::Int64, u::Float64, 
 end
 
 
+
+#### SIN DIFFUSION
+
 function run_all()
     Random.seed!(0)
     L = 10
@@ -155,12 +158,12 @@ function run_all()
     Random.seed!(0)
     T = 50.0
     clock = 2000.0
-    α = 0.7#sin
+    α = 0.5#sin
     u = - Float64(π)
     v = 3*Float64(π)
     X = SinSDE(α, L, T)
-    zz_count = zz_sampler_count(X, T, L, u, v, clock, ξ, θ)
     xx_count = boomerang_count_ind_ref(α, T, L, u, v, clock)
+    zz_count = zz_sampler_count(X, T, L, u, v, clock, ξ, θ)
     return  zz_count, xx_count
 end
 zz_count, xx_count = run_all()
@@ -185,7 +188,7 @@ function average_event(L, count)
 end
 
 
-
+#####################BROWNIAN MOTION α = 0
 
 function run_all()
     Random.seed!(0)
@@ -228,3 +231,7 @@ p = plot(0:L, [log.(zz_ave), log.(xx_ave)],
 plot!(p, 0:L, log.(zz_ave_bb), lab = "ZZ, alpha = 0.0", c = :blue, line=(:dash, 0.5))
 plot!(p, 0:L, log.(xx_ave_bb), lab = "Boom, alpha = 0.0",  c = :red, line=(:dash, 0.5))
 savefig("./boomerang/events_comparison/comparison1.pdf")
+
+
+
+zz_sampler_count_ub()

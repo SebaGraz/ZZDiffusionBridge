@@ -193,15 +193,13 @@ end
 accept reject time drwan from upper bound λbar relative to the coefficient `n`
 of model `SinSDE` starting at `u` and ending at `v`
 """
-function ∇U_tilde(ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
-    ∇U_tilde = zeros(length(ϕ))
+function ∇U_tilde!(∇U_tilde::Vector{Float64}, ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
     for n in 1:length(ϕ)
         t = MCintegration(ϕ[n])
         XX = fs_expansion(t, ξ, ϕ, u, v, L, T)
         ϕ_t = Λ(ϕ[n], t)
         ∇U_tilde[n] = 0.5*ϕ[n].range*ϕ_t*(α*α*sin(2.0*(XX)) - α*sin(XX))
     end
-    return ∇U_tilde
 end
 
 
@@ -236,6 +234,7 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
     #if Q_try != Q_try'
     #    error("Q not symmetric")
     #end  # does not depend on x, v so precompile till here
+    ∇Utilde = zeros(2^(L+1)-1)
     ∇Ubar = ∇U_bar(α, ϕ, L, T)# does not depend on x, v so precompile
     λ_bar = λbar2(ξ, θ, ∇Ubar)
     τ0 = event_λ_const(λ_bar)
@@ -257,7 +256,7 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref -= τ0
-            ∇Utilde = ∇U_tilde(ξ, ϕ, α, L, T, u, v)
+            ∇U_tilde!(∇U_tilde, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(dot(∇Utilde, θ), 0)/λ_bar
             #if   !(0 <= acc_ratio < 1) #DEBUG
                 #println("λ_bar: ", λ_bar)

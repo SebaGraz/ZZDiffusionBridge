@@ -219,11 +219,11 @@ end
 accept reject time drwan from upper bound λbar relative to the coefficient `n`
 of model `SinSDE` starting at `u` and ending at `v`
 """
-function ∇U_tilde_ind(i0::Int64, ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
+function ∇U_tilde_ind!(∇U::Vector{Float64}, i0::Int64, ξ::Vector{Float64}, ϕ::Vector{Fs}, α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
         t = MCintegration(ϕ[i0])
         XX = fs_expansion(t, ξ, ϕ, u, v, L, T)
         ϕ_t = Λ(ϕ[i0], t)
-        return 0.5*ϕ[i0].range*ϕ_t*(α*α*sin(2.0*(XX)) - α*sin(XX))
+        ∇U[i0] = 0.5*ϕ[i0].range*ϕ_t*(α*α*sin(2.0*(XX)) - α*sin(XX))
 end
 
 
