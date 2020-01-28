@@ -24,8 +24,11 @@ For Global Boomerang
 Buonds the Poisson rate with a constant rate
 """
 function λbar2(ξ::Vector{Float64}, θ::Vector{Float64}, ∇Ubar::Vector{Float64})
-    θ_ubs = sqrt.(ξ.*ξ + θ.*θ)
-    return dot(θ_ubs, ∇Ubar)
+    res = 0.0
+    for i in 1:length(ξ)
+        res += sqrt(ξ[i]*ξ[i] + θ[i]*θ[i])* ∇Ubar[i]
+    end
+    return res
 end
 
 """
@@ -190,7 +193,7 @@ function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Floa
 end
 
 
-clock = 100.
+clock = 1000.
 α = 0.4
 T = 50.
 L = 6
