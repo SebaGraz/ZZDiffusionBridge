@@ -171,7 +171,7 @@ function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Floa
         if τ_ref < τ0
             ξ, θ =  boomerang_traj(ξ, θ, τ_ref)
             t += τ_ref
-            θ = randn(length(θ))
+            randn!(θ)
             push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
             λ_bar = λbar2(ξ, θ, ∇Ubar)
             τ0 = event_λ_const(λ_bar)
