@@ -158,12 +158,15 @@ end
 
 
 """
-
-Try new bounds, constant
+For Global Boomerang
+Buonds the Poisson rate with a constant rate
 """
 function λbar2(ξ::Vector{Float64}, θ::Vector{Float64}, ∇Ubar::Vector{Float64})
-    θ_ubs = sqrt.(ξ.*ξ + θ.*θ)
-    return dot(θ_ubs, ∇Ubar)
+    res = 0.0
+    for i in 1:length(ξ)
+        res += sqrt(ξ[i]*ξ[i] + θ[i]*θ[i])* ∇Ubar[i]
+    end
+    return res
 end
 
 """
@@ -213,41 +216,34 @@ end
 
 """
     R(x, v , ∇U_tilde)
-
+for the Global boomeranf
 contour reflections
 """
-function R(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
-    return θ - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde
+function R!(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
+    c = 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)
+    for i in 1:length(ξ)
+        θ[i] = θ[i] - c*∇U_tilde[i]
+    end
 end
 
 
-
-function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
-    clearconsole()
+function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
+    Random.seed!(0)
     ξ = zeros(2^(L+1)-1)
     θ = randn(2^(L+1)-1)
     t = 0.0
-    α = 0.5
-    c = 0.001
     ϕ = generate(L, T)
-    #Q_try = Q(α, ϕ, L, T) #DEBUG
-    #if Q_try != Q_try'
-    #    error("Q not symmetric")
-    #end  # does not depend on x, v so precompile till here
     ∇Utilde = zeros(2^(L+1)-1)
-    ∇Ubar = ∇U_bar(α, ϕ, L, T)# does not depend on x, v so precompile
+    ∇Ubar = ∇U_bar(α, ϕ, L, T) # does not depend on x, v so precompile
     λ_bar = λbar2(ξ, θ, ∇Ubar)
     τ0 = event_λ_const(λ_bar)
-    #println("time: ", τ0) #DEBUG
-    #println("a + b*τ0: ", a + b*τ0) #DEBUG
     τ_ref = event_λ_const(c)
     Ξ = [Skeleton2(copy(ξ), copy(θ), t)]
     while t < clock
         if τ_ref < τ0
-            #println("STEP: refreshment")
             ξ, θ =  boomerang_traj(ξ, θ, τ_ref)
             t += τ_ref
-            θ = randn(length(θ))
+            randn!(θ)
             push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
             λ_bar = λbar2(ξ, θ, ∇Ubar)
             τ0 = event_λ_const(λ_bar)
@@ -256,29 +252,21 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref -= τ0
-            ∇U_tilde!(∇U_tilde, ξ, ϕ, α, L, T, u, v)
+            ∇U_tilde!(∇Utilde, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(dot(∇Utilde, θ), 0)/λ_bar
-            #if   !(0 <= acc_ratio < 1) #DEBUG
-                #println("λ_bar: ", λ_bar)
-                #println("lambda tilde ",  max(dot(∇Utilde, θ), 0))
-                #println("acc_ratio: ", acc_ratio)
-                #error("invalid acc/rej ratio")
-            #end
             if acc_ratio > rand()
-                #println("STEP: ok acc_ratio, accept event time")
-                θ = R(ξ, θ, ∇Utilde)
+                R!(ξ, θ, ∇Utilde)
                 push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
                 λ_bar = λbar2(ξ, θ, ∇Ubar)
                 τ0 = event_λ_const(λ_bar)
             else
-                #println("STEP: ok acc_ratio, reject event time"
-                # λ_bar = λbar2(ξ, θ, ∇Ubar) It is not needed
                 τ0 = event_λ_const(λ_bar)
             end
         end
     end
     return Ξ
 end
+
 error("STOP HERE")
 
 T = 50.0
