@@ -73,8 +73,11 @@ end
 for the Global boomeranf
 contour reflections
 """
-function R(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
-    return θ - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde
+function R!(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
+    c = 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)
+    for i in 1:length(ξ)
+        θ[i] = θ[i] - c*∇U_tilde[i]
+    end
 end
 
 ##### for the local boomerang
@@ -180,7 +183,7 @@ function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Floa
             ∇U_tilde!(∇Utilde, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(dot(∇Utilde, θ), 0)/λ_bar
             if acc_ratio > rand()
-                θ[:] = R(ξ, θ, ∇Utilde)
+                R!(ξ, θ, ∇Utilde)
                 push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
                 λ_bar = λbar2(ξ, θ, ∇Ubar)
                 τ0 = event_λ_const(λ_bar)
@@ -193,7 +196,7 @@ function global_boomerang(α::Float64, c::Float64, T::Float64, L::Int64, u::Floa
 end
 
 
-clock = 1000.
+clock = 100.
 α = 0.4
 T = 50.
 L = 6
