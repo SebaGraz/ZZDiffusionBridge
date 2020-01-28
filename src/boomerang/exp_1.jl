@@ -280,6 +280,7 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
     end
     return Ξ
 end
+error("STOP HERE")
 
 T = 50.0
 u = Float64(-π)
@@ -288,7 +289,6 @@ L = 6
 clock = 10000.0
 Ξ = boomerang_sampler_sin(T, L, u, v, clock)
 
-error("STOP HERE")
 
 save("ouput.jld", "output", Ξ)
 

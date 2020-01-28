@@ -268,50 +268,63 @@ function rescale!(i0::Int64, N::Int64, τ0::Float64, τ::Vector{Float64})
     for i in  (i0 + 1): N
         τ[i] -=  τ0
     end
+    return τ
 end
 
-
-function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
+function boomerang_ind_refresh(T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
     clearconsole()
     N = 2^(L+1)-1
     ξ = zeros(N)
     θ = randn(N)
     t = 0.0
     α = 0.5
-    c = 0.001
+    c = 0.01
     ϕ = generate(L, T)
     #initialize quantities
     ∇Utilde = [∇U_tilde_ind(i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
     ∇Ubar = ∇U_bar(α, ϕ, L, T)# does not depend on x, v so precompile
     λ_bar =  [λbar_ind(ξ[i], θ[i], ∇Ubar[i]) for i in 1:N] #vector
     τ = event_λ_const.(λ_bar) #vector
-    τ_ref = [event_λ_const(c) for i in 1:N]
+    τ_ref = [event_λ_const(c) for i in 1:N] #vector
     Ξ = [Skeleton2(copy(ξ), copy(θ), t)]
     τ0, i0 = findmin(τ)
-    τ_ref0 , i_ref0 = findmin(τ)
+    τ_ref0, i_ref0 = findmin(τ_ref)
+    println("τ ref : ", τ_ref)
+    println("τ ref0 : ", τ_ref0)
+    println("τ  : ", τ)
+    println("τ0 : ", τ0)
     while t < clock
         if τ_ref0 < τ0
-            #println("STEP: refreshment")
+            #println("STEP: refreshment with τ_ref = ", τ_ref)
             ξ, θ =  boomerang_traj(ξ, θ, τ_ref0)
             t += τ_ref0
             θ[i_ref0] = randn()
             push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
-            rescale!(i_ref0, N, τ_ref[i_ref0], τ_ref)
+            ### RESCALE
+            #τ = rescale!(i_ref0, N, τ_ref0, τ_ref)
+            for i in 1:(i_ref0 - 1)
+                τ_ref[i] -= τ_ref0
+            end
+            for i in  (i_ref0 + 1): N
+                τ_ref[i] -=  τ_ref0
+            end
             τ .-= τ_ref0
+            ## Draw new time
             λ_bar[i_ref0] =  λbar_ind(ξ[i_ref0], θ[i_ref0], ∇Ubar[i_ref0])
             τ[i_ref0] = event_λ_const(λ_bar[i_ref0])
             τ_ref[i_ref0] = event_λ_const(c)
         else
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
+            τ_ref .-= τ0
             ∇Utilde[i0] = ∇U_tilde_ind(i0, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(∇Utilde[i0]*θ[i0], 0)/λ_bar[i0] #max not necessary
-            if   !(0 <= acc_ratio < 1) #DEBUG
+            #if   !(0 <= acc_ratio < 1) #DEBUG
                 #println("λ_bar: ", λ_bar)
                 #println("lambda tilde ",  max(dot(∇Utilde, θ), 0))
                 #println("acc_ratio: ", acc_ratio)
-                error("invalid acc/rej ratio")
-            end
+                #error("invalid acc/rej ratio")
+            #end
             if acc_ratio > rand()
                 #println("STEP: ok accept event time with prob: ", acc_ratio)
                 θ[i0] = -θ[i0]
@@ -323,23 +336,27 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
                 # λ_bar = λbar2(ξ, θ, ∇Ubar) It is not needed
                 τ[i0] = event_λ_const(λ_bar[i0])
             end
-            rescale!(i0, N, τ0, τ)
-            τ_ref .-= τ0
-            τ0, i0 = findmin(τ)
-            τ_ref0 , i_ref0 = findmin(τ)
+            for i in 1:(i0-1)
+                τ[i] -= τ0
+            end
+            for i in  (i0 + 1): N
+                τ[i] -=  τ0
+            end
         end
+        τ0, i0 = findmin(τ)
+        τ_ref0 , i_ref0 = findmin(τ_ref)
     end
     return Ξ
 end
+error("STOP HERE")
 
 T = 50.0
 u = Float64(-π)
 v =  Float64(3π)
-L = 7
+L = 5
 clock = 10000.0
-Ξ = boomerang_sampler_sin(T, L, u, v, clock)
+Ξ = boomerang_ind_refresh(T, L, u, v, clock)
 
-error("STOP HERE")
 
 save("ouput.jld", "output", Ξ)
 

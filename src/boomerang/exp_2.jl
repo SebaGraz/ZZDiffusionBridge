@@ -265,13 +265,12 @@ end
 
 
 function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
-    clearconsole()
     N = 2^(L+1)-1
     ξ = zeros(N)
     θ = randn(N)
     t = 0.0
     α = 0.5
-    c = 0.1
+    c = 0.001*N
     ϕ = generate(L, T)
     #Q_try = Q(α, ϕ, L, T) #DEBUG
     #if Q_try != Q_try'
@@ -288,7 +287,7 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
     τ0, i0 = findmin(τ)
     while t < clock
         if τ_ref < τ0
-            #println("STEP: refreshment")
+            #println("STEP: refreshment with τ_ref = ", τ_ref)
             ξ, θ =  boomerang_traj(ξ, θ, τ_ref)
             t += τ_ref
             θ = randn(N)
@@ -297,17 +296,18 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
             τ = event_λ_const.(λ_bar)
             τ_ref = event_λ_const(c)
         else
+            #println("STEP: τ = ", τ0)
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref -= τ0
             ∇Utilde[i0] = ∇U_tilde_ind(i0, ξ, ϕ, α, L, T, u, v) #TODO
             acc_ratio = max(∇Utilde[i0]*θ[i0], 0)/λ_bar[i0] #max not necessary
-            if   !(0 <= acc_ratio < 1) #DEBUG
+            #if   !(0 <= acc_ratio < 1) #DEBUG
                 #println("λ_bar: ", λ_bar)
                 #println("lambda tilde ",  max(dot(∇Utilde, θ), 0))
                 #println("acc_ratio: ", acc_ratio)
-                error("invalid acc/rej ratio")
-            end
+                #error("invalid acc/rej ratio")
+            #end
             if acc_ratio > rand()
                 #println("STEP: ok accept event time with prob: ", acc_ratio)
                 θ[i0] = -θ[i0]
@@ -331,6 +331,8 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
     return Ξ
 end
 
+error("STOP HERE")
+
 T = 50.0
 u = Float64(-π)
 v =  Float64(3π)
@@ -338,7 +340,6 @@ L = 7
 clock = 10000.0
 Ξ = boomerang_sampler_sin(T, L, u, v, clock)
 
-error("STOP HERE")
 
 save("ouput.jld", "output", Ξ)
 
