@@ -28,38 +28,6 @@ function boomerang_traj(ξ::Vector{Float64}, θ::Vector{Float64}, t::Float64)
 end
 
 
-
-
-"""
-    Q(α, ϕ, L, T)
-
-generate matrix `Q` for the sin process X with diffusion length T.
-Does not depend on ξ --> pre-compile
-"""
-function Q(α::Float64, ϕ::Vector{Fs}, L::Int64, T::Float64)
-    dim = 2^(L+1) -1
-    Q = zeros(dim,dim)
-    for i in 1:dim
-        for j in 1:i
-            if i == j
-                Q[i,i] = 0.5*ϕ[i].supr*ϕ[i].δ*(2*α^2 + α)
-            else
-                if ShareDomain(i,j)==1
-                    ub = min(ϕ[i].ub, ϕ[j].ub)
-                    lb = max(ϕ[i].lb, ϕ[j].lb)
-                    S_ij = ub - lb
-                    Q[i,j] = Q[j,i] =  0.5*S_ij*ϕ[i].supr*ϕ[j].supr*(2*α^2 + α)
-                else
-                    Q[i,j] = Q[j,i] = 0
-                end
-            end
-        end
-    end
-    return Q
-end
-
-
-
 """
      ∇U_bar(α::Float64, ϕ::Vector{Fs}, L::Int64, T::Float64)
 
@@ -89,24 +57,6 @@ function fs_expansion(t::Float64, ξ::Vector{Float64}, ϕ::Vector{Fs}, u::Float6
         end
 end
 
-"""
-    ∇U_0_numeric(α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
-
-This has to be changed because I can compute the integral analytically.
-"""
-function ∇U_0_numeric(α::Float64, L::Int64, T::Float64, u::Float64, v::Float64)
-    ∇U_0 = zeros(2^(L+1)-1)
-    for n in 1:length(∇U_0)
-        i, j = Faber(n)
-        dt = 0.001
-        dt2 = dt/2
-        for t in 0:dt:T-dt
-            ∇U_0[n] += 0.5*dt*Λ(t + dt2, i, j, T)*(α^2*sin(2*(u + (v-u)*(t + dt2)/T))
-                        - α*sin((u + (v-u)*(t + dt2)/T)))
-        end
-    end
-    return ∇U_0
-end
 
 
 #Poisson rates
@@ -233,24 +183,15 @@ function acc_rej(∇U_tilde::Vector{Float64}, θ::Vector{Float64})
 end
 
 
-#
+
 # """
-#     R(x, v , ∇U_tilde)
+#     R_ind(x, v , ∇U_tilde)
 #
 # contour reflections
 # """
-# function R(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
-#     return θ - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde
+# function R_ind(i, θ::Array{Float64}, ∇U_tilde::Array{Float64})
+#     return θ[i] - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde[i]
 # end
-
-"""
-    R_ind(x, v , ∇U_tilde)
-
-contour reflections
-"""
-function R_ind(i, θ::Array{Float64}, ∇U_tilde::Array{Float64})
-    return θ[i] - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde[i]
-end
 
 """
     R_ind_2(x, v , ∇U_tilde)
@@ -271,28 +212,45 @@ function rescale!(i0::Int64, N::Int64, τ0::Float64, τ::Vector{Float64})
     return τ
 end
 
+"""
+Takes a quasi-oredered vector `v` with ordering `p` (ordered from the second element of v).
+Update the ordering such that also the first element is ordered as above. This function replaces
+findmin() which should be computationally more expensives.
+#TODO generaliz for the ith compoment
+"""
+function first_event_ordering(v::Vector{Float64}, p::Vector{Int64})
+    p1 = p[1]
+    i_new = searchsortedfirst(v[p[2:end]], v[p1])
+    if i_new == 1
+        return
+    else
+        p[1:i_new - 1] = p[2: i_new]
+        p[i_new] = p1
+    end
+end
+
+
 function boomerang_ind_refresh(T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64)
     clearconsole()
     N = 2^(L+1)-1
     ξ = zeros(N)
     θ = randn(N)
     t = 0.0
-    α = 0.5
-    c = 0.01
+    α = 1.0
+    c = 0.05
     ϕ = generate(L, T)
     #initialize quantities
-    ∇Utilde = [∇U_tilde_ind(i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
+    ∇Utilde = zeros(N)
+    [∇U_tilde_ind!(∇Utilde, i, ξ, ϕ, α, L, T, u, v) for i in 1:N]
     ∇Ubar = ∇U_bar(α, ϕ, L, T)# does not depend on x, v so precompile
     λ_bar =  [λbar_ind(ξ[i], θ[i], ∇Ubar[i]) for i in 1:N] #vector
     τ = event_λ_const.(λ_bar) #vector
     τ_ref = [event_λ_const(c) for i in 1:N] #vector
+    p = sortperm(τ)
+    p_ref   = sortperm(τ_ref)
     Ξ = [Skeleton2(copy(ξ), copy(θ), t)]
-    τ0, i0 = findmin(τ)
-    τ_ref0, i_ref0 = findmin(τ_ref)
-    println("τ ref : ", τ_ref)
-    println("τ ref0 : ", τ_ref0)
-    println("τ  : ", τ)
-    println("τ0 : ", τ0)
+    τ0, i0 = τ[p[1]], p[1]
+    τ_ref0, i_ref0 = τ_ref[p_ref[1]], p_ref[1]
     while t < clock
         if τ_ref0 < τ0
             #println("STEP: refreshment with τ_ref = ", τ_ref)
@@ -313,11 +271,13 @@ function boomerang_ind_refresh(T::Float64, L::Int64, u::Float64, v::Float64, clo
             λ_bar[i_ref0] =  λbar_ind(ξ[i_ref0], θ[i_ref0], ∇Ubar[i_ref0])
             τ[i_ref0] = event_λ_const(λ_bar[i_ref0])
             τ_ref[i_ref0] = event_λ_const(c)
+            first_event_ordering(τ_ref, p_ref)
+            p = sortperm(τ) #TODO # I have to substitute this step
         else
             ξ, θ =  boomerang_traj(ξ, θ, τ0)
             t +=  τ0
             τ_ref .-= τ0
-            ∇Utilde[i0] = ∇U_tilde_ind(i0, ξ, ϕ, α, L, T, u, v)
+            ∇U_tilde_ind!(∇Utilde, i0, ξ, ϕ, α, L, T, u, v)
             acc_ratio = max(∇Utilde[i0]*θ[i0], 0)/λ_bar[i0] #max not necessary
             #if   !(0 <= acc_ratio < 1) #DEBUG
                 #println("λ_bar: ", λ_bar)
@@ -342,19 +302,21 @@ function boomerang_ind_refresh(T::Float64, L::Int64, u::Float64, v::Float64, clo
             for i in  (i0 + 1): N
                 τ[i] -=  τ0
             end
+            first_event_ordering(τ, p)
         end
-        τ0, i0 = findmin(τ)
-        τ_ref0 , i_ref0 = findmin(τ_ref)
+        τ0, i0 = τ[p[1]], p[1]
+        τ_ref0 , i_ref0 =  τ_ref[p_ref[1]], p_ref[1]
     end
     return Ξ
 end
 error("STOP HERE")
 
+Random.seed!(0)
 T = 50.0
 u = Float64(-π)
 v =  Float64(3π)
-L = 5
-clock = 10000.0
+L = 6
+clock = 20000.0
 Ξ = boomerang_ind_refresh(T, L, u, v, clock)
 
 
@@ -384,7 +346,6 @@ function plot_boomerang(Ξ, b, L, T, u, v)
         dx = fs_expansion(ξ_interp, u, v, L, T)
         push!(P, dx)
     end
-    println(length(P) == N)
     p = plot(dt, P, color = :darkrainbow, line_z = (1:N)', linewidth=0.001, alpha = 0.2, leg = false, colorbar = true)
     hline!(p, [n*π for n in -1:2:3], color = :blue)
     display(p)
@@ -394,9 +355,9 @@ end
 
 
 using Plots
-b = 20:10.0:clock-.1
+b = 19:20.0:clock-.1
 length(b)
 plot_boomerang(Ξ, b, L, T, u, v)
 
 
-savefig("boomerang/sin_boom.png")
+savefig("boomerang/sin_boom10.pdf")
