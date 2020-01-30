@@ -93,7 +93,7 @@ run the ZigZag sampler for diffusion `X` conditioned to start at `u` and
 end at `v` at time `T`. The infinite summation is truncated at level `L` and
 the ZigZag process will run up to time `TT`. Optionally set velocities θ
 """
-function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64; ξ =fill(1.0, 2<<L - 1) , θ = fill(1.0, 2<<L - 1))
+function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64, ξ =fill(0.0, 2<<L - 1) , θ = fill(1.0, 2<<L - 1))
     t = 0.0
     S = System(L, T, ξ, θ)
     τ0 = 0.0
@@ -112,4 +112,53 @@ function zz_sampler(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float
         end
     end
     return Ξ
+end
+
+
+
+function zz_sampler_count(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64, ξ =fill(0.0, 2<<L - 1), θ = fill(1.0, 2<<L - 1))
+    t = 0.0
+    S = System(L, T, ξ, θ)
+    τ0 = 0.0
+    n0 = 0
+    Ξ = Skeleton[]
+    num_events = fill(0, 2^(L+1) -1)
+    while t < clock
+        τ0 , n0 = findmin(S.τ)
+        S.ξ .+=  S.θ*τ0
+        t += τ0
+        if acc_rej(n0, S, X, sampling_scheme(X), u, v, t)
+            S.θ[n0] = -S.θ[n0]
+            num_events[n0] += 1
+            update_events!(n0, τ0, S, X, sampling_scheme(X), dependence_strucute(X), true, u, v, t)
+        else
+            update_events!(n0, τ0, S, X, sampling_scheme(X), dependence_strucute(X), false, u, v, t)
+        end
+    end
+    return num_events
+end
+
+
+
+function zz_sampler_count_ub(X::AbstractModel, T::Float64, L::Int64, u::Float64, v::Float64, clock::Float64, ξ =fill(0.0, 2<<L - 1), θ = fill(1.0, 2<<L - 1))
+    t = 0.0
+    S = System(L, T, ξ, θ)
+    τ0 = 0.0
+    n0 = 0
+    Ξ = Skeleton[]
+    num_events = fill(0, 2^(L+1) -1)
+    while t < clock
+        τ0 , n0 = findmin(S.τ)
+        S.ξ .+=  S.θ*τ0
+        t += τ0
+        num_events[n0] += 1
+        if acc_rej(n0, S, X, sampling_scheme(X), u, v, t)
+            S.θ[n0] = -S.θ[n0]
+            update_events!(n0, τ0, S, X, sampling_scheme(X), dependence_strucute(X), true, u, v, t)
+        else
+            update_events!(n0, τ0, S, X, sampling_scheme(X), dependence_strucute(X), false, u, v, t)
+
+        end
+    end
+    return num_events
 end
