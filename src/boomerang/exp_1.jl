@@ -213,6 +213,15 @@ function acc_rej(∇U_tilde::Vector{Float64}, θ::Vector{Float64})
 end
 
 
+"""
+    R(x, v , ∇U_tilde)
+
+contour reflections
+"""
+function R_not_working(ξ::Vector{Float64}, θ::Vector{Float64} , ∇U_tilde::Vector{Float64})
+    return θ[i] - 2*dot(∇U_tilde, θ)/dot(∇U_tilde, ∇U_tilde)*∇U_tilde[i]
+end
+
 
 """
     R(x, v , ∇U_tilde)

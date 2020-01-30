@@ -256,7 +256,7 @@ function boomerang_ind_refresh(T::Float64, L::Int64, u::Float64, v::Float64, clo
             #println("STEP: refreshment with τ_ref = ", τ_ref)
             ξ, θ =  boomerang_traj(ξ, θ, τ_ref0)
             t += τ_ref0
-            θ[i_ref0] = randn()
+            randn!(θ[i_ref0])
             push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
             ### RESCALE
             #τ = rescale!(i_ref0, N, τ_ref0, τ_ref)

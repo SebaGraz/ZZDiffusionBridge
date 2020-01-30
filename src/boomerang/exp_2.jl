@@ -291,7 +291,7 @@ function boomerang_sampler_sin(T::Float64, L::Int64, u::Float64, v::Float64, clo
             #println("STEP: refreshment with τ_ref = ", τ_ref)
             ξ, θ =  boomerang_traj(ξ, θ, τ_ref)
             t += τ_ref
-            θ = randn(N)
+            randn!(θ)
             push!(Ξ, (Skeleton2(copy(ξ), copy(θ), t)))
             λ_bar =  [λbar_ind(ξ[i], θ[i], ∇Ubar[i]) for i in 1:N]
             τ = event_λ_const.(λ_bar)
