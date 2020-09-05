@@ -34,7 +34,7 @@ sampling_scheme(::ModelName) = SubSampling()
 The file [faber.jl](src/faber.jl) and [fs_expansion.jl](src/fs_expansion.jl) contains all the functions necessary to work with the Faber-Schauder functions and change of basis to finite elements. 
 
 ## Benchmark
-An efficient implementation of the fully local Zig-Zag sampler is implemented in the official package (ZigZagBoomerang.jl)[https://github.com/mschauer/ZigZagBoomerang.jl]. We used it to test the performances of the Zig-Zag sampler agaist the Boomerang sampler and the MALA. The effective sample size is computed using functions implemented in [https://github.com/jbierkens/ICML-boomerang/]. 
+An efficient implementation of the fully local Zig-Zag sampler is implemented in the official package [ZigZagBoomerang.jl](https://github.com/mschauer/ZigZagBoomerang.jl). We used it to test the performances of the Zig-Zag sampler agaist the Boomerang sampler and the MALA. The effective sample size is computed using functions implemented in [https://github.com/jbierkens/ICML-boomerang/]. 
 
 ## Literature
 - Joris Bierkens, Sebastiano Grazzi, Frank van der Meulen, Moritz Schauer: A piecewise deterministic Monte Carlo method for diffusion bridges. 2020. [https://arxiv.org/abs/2001.05889].
