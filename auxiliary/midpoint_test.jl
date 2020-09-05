@@ -39,7 +39,7 @@ end
 midp = midpoint_sample(Ξ, u, v, T)
 #a = histogram(midp)
 x = kde(midp)
-aa = plot(x.x,x.density, leg = false)
+aa = plot(x.x,x.density, leg = false, size = (300, 300) )
 
 
 #### Real density
@@ -86,5 +86,5 @@ end
 
 
 
-plot!(aa, Normal(μ, sqrt(σ)), label = "true distribution")
-savefig("../../output/midpoint.png")
+plot!(aa, Normal(μ, sqrt(σ)), label = "true distribution" )
+savefig("./output/midpoint300.pdf")
