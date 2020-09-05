@@ -1,5 +1,5 @@
 # ZZDiffusionBridge
-ZigZag sampler is used to explore the conditional measure of a diffusion process. This measure lays in a high dimensional space (infinite dimensional) and could differ significantly from a Gaussian measure (which in our case is the reference measure). The repo is currently under development. To see and edit the notes see https://www.overleaf.com/2848134699gmmwzrpsyvsx .
+ZigZag sampler is used to explore the conditional measure of a diffusion process. This measure lays in a high dimensional space (infinite dimensional) and could differ significantly from a Gaussian measure (which in our case is the reference measure). 
 
 
 ## Overview
@@ -33,27 +33,11 @@ sampling_scheme(::ModelName) = SubSampling()
 ## Faber-Schauder functions
 The file [faber.jl](src/faber.jl) and [fs_expansion.jl](src/fs_expansion.jl) contains all the functions necessary to work with the Faber-Schauder functions and change of basis to finite elements. 
 
-## Tuning the velocities
-The script [tune_velocities.jl](scripts/tune_velocities.jl) computes the sample mean of the path integral for the sde dX_t = \alpha sin(X_t)dt + dB_t starting from -3\pi and ending at 3\pi at time 200. By symmetry of the sde, the real mean should be 0 and therefore we can compute the distance between sample and real mean, as a function of the time of the ZigZag sampler. We repeated the experiment for different values of \beta which determines the decay of the velocties 2^(-i\beta) where i is the level. Finally we plot the results. **N.B** this is still unstable and does not bring the desired results. 
+## Benchmark
+An efficient implementation of the fully local Zig-Zag sampler is implemented in the official package [ZigZagBoomerang.jl](https://github.com/mschauer/ZigZagBoomerang.jl). We used it to test the performances of the Zig-Zag sampler agaist the Boomerang sampler and the MALA. The effective sample size is computed using functions implemented in [https://github.com/jbierkens/ICML-boomerang/]. 
 
-## Comparisons
-We would like to compare with the **Stochastic gradient Langevin dynamics** [for info here!](https://en.wikipedia.org/wiki/Stochastic_gradient_Langevin_dynamics). This is because, as the methodology we propose, this sampling method use a Monte Carlo estimator for the Gradient of the energy function. The script is [here](scripts/s_langevin_diffusion.jl), you just need to run it. You can play around with the parameters: step size `step_size`, number of steps `nstep`, number of skipped jumps before saving `skip`.  The method is simple to implement and the results do not seem that bad, although you need to tune the discretization step. If it is too little, it does not mix, if it is too large, it diverges from the real density. From here maybe it is worth to implement a Mala (or stochastic mala).
-
-## Results!
-
-Sine SDE with alpha = 0.7
-
-![temp](output/sin_07.png)
-
-Exponential growth model with r = 0.1, b=0.1 K = 2000
-
-![temp](output/exp_growth_01_01_2000.png)
-
-Orstein-Uhlenbeck process with \mu = -5 and \nu= 1.0
-
-![temp](output/ou_1_m5.png)
-
-Stochastic gradient Langevin dynamic for the sine SDE with alpha = 0.7, batch size = 2^(L-1) - 1 
-
-![temp](output/langevin_sampler_sin_07.png)
+## Literature
+- Joris Bierkens, Sebastiano Grazzi, Frank van der Meulen, Moritz Schauer: A piecewise deterministic Monte Carlo method for diffusion bridges. 2020. [https://arxiv.org/abs/2001.05889].
+- Joris Bierkens, Sebastiano Grazzi, Kengo Kamatani and Gareth Robers: The Boomerang Sampler. ICML 2020. [https://arxiv.org/abs/2006.13777]. 
+- Moritz Schauer, Sebastiano Grazzi: ZigZagBoomerang.jl. 2020. [https://github.com/mschauer/ZigZagBoomerang.jl]
 
