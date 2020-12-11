@@ -5,9 +5,9 @@
 
 using ZigZagBoomerang, SparseArrays, LinearAlgebra
 #using CairoMakie
-include("../../faberschauder.jl")
-include("../../../../ICML-boomerang/julia/asvar.jl")
-include("../../../../ICML-boomerang/julia/pdmp.jl")
+include("../../src/faberschauder.jl")
+include("../../src/asvar.jl")
+include("../../src/pdmp.jl")
 
 const ZZB = ZigZagBoomerang
 using CSV

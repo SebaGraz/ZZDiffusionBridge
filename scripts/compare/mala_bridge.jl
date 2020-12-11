@@ -3,9 +3,9 @@
 # Mala for comparison with adaptation   #
 #########################################
 using Random
-include("../../faberschauder.jl")
-include("../../../../ICML-boomerang/julia/asvar.jl")
-include("../../../../ICML-boomerang/julia/pdmp.jl")
+include("../../src/faberschauder.jl")
+include("../../src/asvar.jl")
+include("../../src/pdmp.jl")
 
 function get_info(ϕ, ∇ϕ, ξ, L, α, T)
     U = 0.5*dot(ξ, ξ) #gaussian part
