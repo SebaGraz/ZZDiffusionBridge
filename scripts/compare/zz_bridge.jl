@@ -273,9 +273,9 @@ end
 using CSV, JLD2
 df, zz, zz_var1, zz_var2 = data_collection(df)
 #CSV.write("./scripts/zz_diff_bridges/compare/benchamrk_zz_final.csv", df)
-@save "./scripts/zz_diff_bridges/compare/covenrgence_zz.jld2" zz
-@save "./scripts/zz_diff_bridges/compare/covenrgence_zz_var.jld2" zz_var
-@save "./scripts/zz_diff_bridges/compare/covenrgence_zz_var1.jld2" zz_var1
+@save "./scripts/compare/covenrgence_zz.jld2" zz
+@save "./scripts/compare/covenrgence_zz_var.jld2" zz_var1
+@save "./scripts/compare/covenrgence_zz_var1.jld2" zz_var2
 error("")
 
 #
