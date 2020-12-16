@@ -14,7 +14,7 @@ function ϕ(ξ, L, T; p = T/(1<<L)) # formula (17)
         s = p*0.5
         for i in 1:(1<<L)
             x = dotψ(ξ, s, L,  T)
-            r += 0.5*p*(b(x)^2* + b′(x))
+            r += 0.5*p*(b(x)^2 + b′(x))
             s += p
         end
         @assert  T+p*0.5 - 0.0001 < s < T+p*0.5 + 0.0001
